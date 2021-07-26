@@ -15,8 +15,14 @@ import 'package:hiverrr/presentation/widgets/screen_header/screen_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ManualTransfer extends StatefulWidget {
+  final String? username;
+  final String? amount;
+  final String? memo;
   ManualTransfer({
     Key? key,
+    this.username,
+    this.amount,
+    this.memo,
   }) : super(key: key);
 
   @override
@@ -167,6 +173,10 @@ class _ManualTransferState extends State<ManualTransfer> {
 
   @override
   void initState() {
+    _usernameController.text =
+        (widget.username == null ? '' : widget.username)!;
+    _amountController.text = (widget.amount == null ? '' : widget.amount)!;
+    _memoController.text = (widget.memo == null ? '' : widget.memo)!;
     super.initState();
   }
 

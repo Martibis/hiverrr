@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
 import 'package:hiverrr/presentation/receive/receive.dart';
+import 'package:hiverrr/presentation/send/manual_transfer.dart';
 import 'package:hiverrr/presentation/send/send.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
@@ -987,12 +988,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         tapable: true,
                         onTap: () {
                           //TODO: send with receiver martibis?
-                          BotToast.showText(
+                          /*  BotToast.showText(
                             crossPage: false,
                             text: "This feature is coming soon 🤩",
                             textStyle: TextStyle(color: Colors.white),
                             borderRadius: BorderRadius.circular(4),
-                          );
+                          ); */
+                          Navigator.of(context, rootNavigator: true)
+                              .push(MaterialPageRoute(
+                                  builder: (_) => ManualTransfer(
+                                        username: 'martibis',
+                                        amount: '10',
+                                        memo:
+                                            'Thank you for wanting to donate to Hiverrr. Because of you we can keep up with development and improve even further!',
+                                      )));
                         },
                         mainContent: Text(
                           '🙏',
