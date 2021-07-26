@@ -1000,7 +1000,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         username: 'martibis',
                                         amount: '10',
                                         memo:
-                                            'Thank you for wanting to donate to Hiverrr. Because of you we can keep up with development and improve even further!',
+                                            'Thank you for wanting to donate so we can keep improving Hiverrr!',
                                       )));
                         },
                         mainContent: Text(
