@@ -2,11 +2,13 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hiverrr/blocs/subscriptions_bloc/subscriptions_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
 import 'package:hiverrr/presentation/receive/receive.dart';
 import 'package:hiverrr/presentation/send/manual_transfer.dart';
 import 'package:hiverrr/presentation/send/send.dart';
+import 'package:hiverrr/presentation/subscriptions/subscriptions.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -56,24 +58,35 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => AuthBloc()..add(TryLogInFromToken()),
         ),
-        BlocProvider(create: (context) => UserbalanceBloc())
+        BlocProvider(create: (context) => UserbalanceBloc()),
+        BlocProvider(create: (context) => SubscriptionsBloc())
       ],
-      child: BlocListener<ThemingBloc, ThemingState>(
-        listener: (context, state) {
-          if (state is ThemeLoaded) {
-            print('here');
-            print(state.light);
-            setState(() {
-              light = state.light;
-            });
-          }
-        },
-        child: MaterialApp(
-          title: 'Hiverrr',
-          builder: BotToastInit(),
-          navigatorObservers: [BotToastNavigatorObserver()],
-          theme: light ? themeDatas.lightTheme : themeDatas.darkTheme,
-          home: MyHomePage(),
+      child: MaterialApp(
+        title: 'Hiverrr',
+        builder: BotToastInit(),
+        navigatorObservers: [BotToastNavigatorObserver()],
+        theme: light ? themeDatas.lightTheme : themeDatas.darkTheme,
+        home: BlocListener<ThemingBloc, ThemingState>(
+          listener: (context, state) {
+            if (state is ThemeLoaded) {
+              setState(() {
+                light = state.light;
+              });
+            }
+          },
+          child: BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              // TODO: implement listener
+              if (state is LoggedIn) {
+                BlocProvider.of<UserbalanceBloc>(context)
+                    .add(GetUserBalance(username: state.user.username));
+                /* BlocProvider.of<SubscriptionsBloc>(context).add(
+                    FetchSubscriptions(
+                        pageKey: 0, username: state.user.username)); */
+              }
+            },
+            child: MyHomePage(),
+          ),
         ),
       ),
     );
@@ -95,15 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is LoggedIn) {
-          BlocProvider.of<UserbalanceBloc>(context)
-              .add(GetUserBalance(username: state.user.username));
-        }
-      },
+    return Scaffold(body: SafeArea(child: BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is LoggedIn) {
           return Container(
@@ -344,13 +349,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   Container(
                     height: 25,
                   ),
-                  /* Row(children: [
+                  Row(children: [
                     Expanded(
                       child: NeumorphismContainer(
                           padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
                           color: Theme.of(context).accentColor,
                           tapable: true,
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                    builder: (_) => SubscriptionsPage(
+                                        username: state.user.username)));
+                          },
                           mainContent: Text('Subscriptions',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -363,7 +373,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ]),
                   Container(
                     height: 25,
-                  ), */
+                  ),
                   BlocBuilder<UserbalanceBloc, UserbalanceState>(
                     builder: (context, state) {
                       if (state is UserBalancedLoaded) {

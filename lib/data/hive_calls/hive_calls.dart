@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as d;
 import 'dart:math';
 
 import 'package:hiverrr/constants/constants.dart';
+import 'package:hiverrr/data/models/subscription_model.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -183,8 +185,76 @@ class HiveCalls {
     return uri;
   }
 
-  //TODO: fix this
-  Future<bool> lastTransactions(
+  Future<List<Subscription>> getSubscriptions(
+      {required String username,
+      required int pageKey,
+      required int limit}) async {
+    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[0]),
+        body:
+            '{"jsonrpc":"2.0", "method":"database_api.find_recurrent_transfers", "params":{"from":"' +
+                username +
+                '", "start": ' +
+                pageKey.toString() +
+                ', "limit":' +
+                limit.toString() +
+                '}, "id": 1}');
+    Map data = await jsonDecode(r.body);
+
+    print(data);
+
+    List<Subscription> subscriptions = [];
+
+    for (int i = 0; i < data['result']['recurrent_transfers'].length; i++) {
+      Map subscriptionMap = data['result']['recurrent_transfers'][0];
+
+      print(subscriptionMap);
+      String username = subscriptionMap['to'];
+      String profilepic = 'https://images.ecency.com/webp/u/' +
+          subscriptionMap['to'] +
+          '/avatar/medium';
+
+      num amount = (num.tryParse(subscriptionMap['amount']['amount'])! /
+          pow(10, subscriptionMap['amount']['precision']));
+
+      String currency =
+          subscriptionMap['amount']['nai'] == HIVENAI ? 'HIVE' : 'HBD';
+      String memo = subscriptionMap['memo'];
+      num recurrence = subscriptionMap['recurrence'];
+      String recurrenceString =
+          'every ' + recurrence.toStringAsFixed(0) + ' hours';
+      switch (recurrence) {
+        case 24:
+          recurrenceString = 'Daily';
+          break;
+        case 168:
+          recurrenceString = 'Weekly';
+          break;
+        case 730:
+          recurrenceString = 'Monthly';
+          break;
+        case 8760:
+          recurrenceString = 'Yearly';
+      }
+      num remainingExecutions = subscriptionMap['remaining_executions'];
+
+      Subscription subscription = Subscription(
+          username: username,
+          profilepic: profilepic,
+          amount: amount,
+          currency: currency,
+          memo: memo,
+          recurrence: recurrence,
+          remainingExecutions: remainingExecutions,
+          reccurenceString: recurrenceString);
+
+      subscriptions.add(subscription);
+    }
+
+    return subscriptions;
+  }
+
+  //TODO: check why this is so slow
+  Future<bool> receivedTransaction(
       {required String username,
       required String memo,
       required String amount,

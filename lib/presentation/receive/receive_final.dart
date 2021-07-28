@@ -6,8 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/authbloc/auth_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
-import 'package:hiverrr/constants/constants.dart';
-import 'package:hiverrr/data/hive_calls/hive_calls.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
 import 'package:hiverrr/presentation/widgets/screen_header/screen_header.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -25,7 +23,6 @@ class ReceiveFinalPage extends StatefulWidget {
 
 class _ReceiveFinalPageState extends State<ReceiveFinalPage> {
   Timer? timer;
-  HiveCalls hc = HiveCalls();
   //TODO: look into this
   /* checkIfReceived() async {
     Uri hsu = Uri.parse(widget.hiveSignerUrl);

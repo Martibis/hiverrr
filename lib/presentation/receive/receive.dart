@@ -209,7 +209,6 @@ class _ReceivePageState extends State<ReceivePage> {
                                   "memo": _memoController.text,
                                   "redirect_uri": 'https://hiverrr.com'
                                 };
-                                HiveCalls hc = HiveCalls();
                                 Uri uri = hc.getHivesignerSignUrl(
                                     type: 'transfer', params: op);
 

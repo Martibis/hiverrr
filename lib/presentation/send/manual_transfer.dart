@@ -363,7 +363,6 @@ class _ManualTransferState extends State<ManualTransfer> {
                                   "memo": _memoController.text,
                                   "redirect_uri": 'https://hiverrr.com'
                                 };
-                                HiveCalls hc = HiveCalls();
                                 Uri uri = hc.getHivesignerSignUrl(
                                     type: 'transfer', params: op);
 
