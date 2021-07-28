@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: SafeArea(child: BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
+      builder: (_, state) {
         if (state is LoggedIn) {
           return Container(
             child: RefreshIndicator(
