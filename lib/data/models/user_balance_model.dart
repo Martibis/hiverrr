@@ -11,6 +11,7 @@ class UserBalance {
   num hivestakedinterest;
   num curationinterest;
   num estimatedUsdValue;
+  num hivePrice;
 
   UserBalance(
       {required this.hbdbalance,
@@ -24,5 +25,6 @@ class UserBalance {
       required this.hivesavinginterestrate,
       required this.curationinterest,
       required this.hivestakedinterest,
-      required this.estimatedUsdValue});
+      required this.estimatedUsdValue,
+      required this.hivePrice});
 }

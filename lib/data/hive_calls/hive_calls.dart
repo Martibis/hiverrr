@@ -166,7 +166,8 @@ class HiveCalls {
         hivesavinginterestrate: hiveSavingsInterestRate,
         hivestakedinterest: hivePowerInterestRate,
         curationinterest: curationInterest,
-        estimatedUsdValue: estimatedUsdValue);
+        estimatedUsdValue: estimatedUsdValue,
+        hivePrice: hivePrice);
   }
 
   //make sure to add redirecturi to params

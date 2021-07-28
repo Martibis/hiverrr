@@ -759,15 +759,36 @@ class _MyHomePageState extends State<MyHomePage> {
                                 padding: EdgeInsets.fromLTRB(20, 15, 20, 25),
                                 color: Theme.of(context).backgroundColor,
                                 expandable: true,
-                                onTap: () {
-                                  BotToast.showText(
-                                    crossPage: false,
-                                    text: "Keep on stacking! 🤑",
-                                    textStyle: TextStyle(color: Colors.white),
-                                    borderRadius: BorderRadius.circular(4),
-                                  );
-                                },
-                                expandableContent: Container(),
+                                onTap: () {},
+                                expandableContent: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Divider(
+                                        height: 50,
+                                      ),
+                                      RichText(
+                                          text: TextSpan(children: [
+                                        TextSpan(
+                                          text: 'USD/HIVE:    ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2,
+                                        ),
+                                        TextSpan(
+                                          text: '\$' +
+                                              state.userBalance.hivePrice
+                                                  .toStringAsFixed(2),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Theme.of(context)
+                                                      .highlightColor),
+                                        ),
+                                      ]))
+                                    ]),
                                 mainContent: Container(
                                   width: double.infinity,
                                   child: Column(
