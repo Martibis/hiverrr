@@ -138,6 +138,22 @@ class HiveCalls {
     num curationInterest =
         ((curationRewards / ownedVestsBalance) * times) * 100;
 
+    http.Response r4 = await http.post(Uri(scheme: 'https', host: HIVENODES[0]),
+        body:
+            '{"jsonrpc":"2.0", "method":"database_api.get_current_price_feed", "id":1}');
+    Map data4 = await jsonDecode(r4.body);
+
+    print(data4);
+
+    num hivePrice = (num.tryParse(data4['result']['base']['amount'])! /
+        pow(10, data4['result']['base']['precision']));
+
+    num estimatedUsdValue = hbdBalance +
+        (hiveBalance * hivePrice) +
+        savingHbdBalance +
+        (hivePower * hivePrice) +
+        (savingHiveBalance * hivePrice);
+
     return UserBalance(
         hbdbalance: hbdBalance,
         hivebalance: hiveBalance,
@@ -149,7 +165,8 @@ class HiveCalls {
         hbdsavinginterestrate: hbdSavingsInterestRate,
         hivesavinginterestrate: hiveSavingsInterestRate,
         hivestakedinterest: hivePowerInterestRate,
-        curationinterest: curationInterest);
+        curationinterest: curationInterest,
+        estimatedUsdValue: estimatedUsdValue);
   }
 
   //make sure to add redirecturi to params

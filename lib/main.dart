@@ -344,6 +344,26 @@ class _MyHomePageState extends State<MyHomePage> {
                   Container(
                     height: 25,
                   ),
+                  /* Row(children: [
+                    Expanded(
+                      child: NeumorphismContainer(
+                          padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                          color: Theme.of(context).accentColor,
+                          tapable: true,
+                          onTap: () {},
+                          mainContent: Text('Subscriptions',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              )),
+                          expandableContent: Container()),
+                    ),
+                  ]),
+                  Container(
+                    height: 25,
+                  ), */
                   BlocBuilder<UserbalanceBloc, UserbalanceState>(
                     builder: (context, state) {
                       if (state is UserBalancedLoaded) {
@@ -733,11 +753,64 @@ class _MyHomePageState extends State<MyHomePage> {
                             Container(
                               height: 25,
                             ),
+                            Container(
+                              child: NeumorphismContainer(
+                                tapable: true,
+                                padding: EdgeInsets.fromLTRB(20, 15, 20, 25),
+                                color: Theme.of(context).backgroundColor,
+                                expandable: true,
+                                onTap: () {},
+                                //TODO: expandable content
+                                expandableContent: Container(),
+                                mainContent: Container(
+                                  width: double.infinity,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Estimated account value',
+                                      ),
+                                      Container(
+                                        height: 25,
+                                      ),
+                                      RichText(
+                                          text: TextSpan(children: [
+                                        TextSpan(
+                                          text: 'USD:   ',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(fontSize: 18),
+                                        ),
+                                        TextSpan(
+                                          text: state
+                                              .userBalance.estimatedUsdValue
+                                              .toStringAsFixed(2),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold),
+                                        ),
+                                      ])),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 25,
+                            ),
                           ],
                         );
                       }
                       if (state is UserBalanceError) {
-                        return Container();
+                        //TODO
+                        return Container(
+                          child: Text('Something broke hard'),
+                        );
                       }
                       return Column(
                         children: [
@@ -972,6 +1045,68 @@ class _MyHomePageState extends State<MyHomePage> {
                           ]),
                           Container(
                             height: 25,
+                          ),
+                          Stack(children: [
+                            Container(
+                              child: NeumorphismContainer(
+                                padding: EdgeInsets.fromLTRB(20, 15, 20, 25),
+                                color: Theme.of(context).backgroundColor,
+                                onTap: () {},
+                                expandableContent: Container(),
+                                mainContent: Shimmer.fromColors(
+                                  baseColor: Theme.of(context).backgroundColor,
+                                  highlightColor:
+                                      BlocProvider.of<ThemingBloc>(context)
+                                              .light
+                                          ? Colors.white
+                                          : Colors.white10,
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Estimated account value',
+                                        ),
+                                        Container(
+                                          height: 25,
+                                        ),
+                                        RichText(
+                                            text: TextSpan(children: [
+                                          TextSpan(
+                                            text: 'USD:   ',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(fontSize: 18),
+                                          ),
+                                          TextSpan(
+                                            text: '0.00',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                        ])),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(45, 15, 20, 15),
+                              child: Text(
+                                'Estimated account value',
+                              ),
+                            )
+                          ]),
+                          Container(
+                            height: 25,
                           )
                         ],
                       );
@@ -987,13 +1122,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).backgroundColor,
                         tapable: true,
                         onTap: () {
-                          //TODO: send with receiver martibis?
-                          /*  BotToast.showText(
-                            crossPage: false,
-                            text: "This feature is coming soon 🤩",
-                            textStyle: TextStyle(color: Colors.white),
-                            borderRadius: BorderRadius.circular(4),
-                          ); */
                           Navigator.of(context, rootNavigator: true)
                               .push(MaterialPageRoute(
                                   builder: (_) => ManualTransfer(
