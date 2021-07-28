@@ -759,8 +759,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                 padding: EdgeInsets.fromLTRB(20, 15, 20, 25),
                                 color: Theme.of(context).backgroundColor,
                                 expandable: true,
-                                onTap: () {},
-                                //TODO: expandable content
+                                onTap: () {
+                                  BotToast.showText(
+                                    crossPage: false,
+                                    text: "Keep on stacking! 🤑",
+                                    textStyle: TextStyle(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(4),
+                                  );
+                                },
                                 expandableContent: Container(),
                                 mainContent: Container(
                                   width: double.infinity,
