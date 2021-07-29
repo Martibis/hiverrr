@@ -1196,7 +1196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       profilepic:
                                           'https://images.ecency.com/webp/u/martibis/avatar/medium',
                                       amount: 5,
-                                      currency: 'HIVE',
+                                      currency: 'HBD',
                                       reccurenceString: 'Monthly',
                                       recurrence: HOURSPERMONTH,
                                       remainingExecutions:
