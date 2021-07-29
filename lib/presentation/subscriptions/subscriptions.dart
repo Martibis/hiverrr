@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/authbloc/auth_bloc.dart';
 import 'package:hiverrr/blocs/subscriptions_bloc/subscriptions_bloc.dart';
 import 'package:hiverrr/data/models/subscription_model.dart';
+import 'package:hiverrr/presentation/subscriptions/subscription.dart';
 import 'package:hiverrr/presentation/widgets/infinite_list_exceptions/empty_list_indicator.dart';
 import 'package:hiverrr/presentation/widgets/infinite_list_exceptions/error_indicator.dart';
 import 'package:hiverrr/presentation/widgets/infinite_list_exceptions/loading_more_indicator.dart';
@@ -25,7 +26,7 @@ class SubscriptionsPage extends StatefulWidget {
 
 class _SubscriptionsPageState extends State<SubscriptionsPage> {
   final ScrollController _scrollController = ScrollController();
-  final PagingController<int, Subscription> _pagingController =
+  final PagingController<int, SubscriptionModel> _pagingController =
       PagingController(firstPageKey: 0);
   @override
   void initState() {
@@ -68,7 +69,8 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> {
                     scrollController: _scrollController,
                     pagingController: _pagingController,
                     physics: AlwaysScrollableScrollPhysics(),
-                    builderDelegate: PagedChildBuilderDelegate<Subscription>(
+                    builderDelegate: PagedChildBuilderDelegate<
+                            SubscriptionModel>(
                         noItemsFoundIndicatorBuilder: (context) =>
                             EmptyListIndicator(
                               message: 'No active subscriptions',
@@ -102,8 +104,16 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> {
                             ),
                         itemBuilder: (_, item, index) {
                           return NeumorphismContainer(
+                              margin: EdgeInsets.fromLTRB(25, 0, 25, 25),
                               color: Theme.of(context).backgroundColor,
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context, rootNavigator: true)
+                                    .push(MaterialPageRoute(
+                                        builder: (_) => Subscription(
+                                              subscription: item,
+                                              changingSubscription: true,
+                                            )));
+                              },
                               expandable: false,
                               tapable: true,
                               mainContent: Row(
@@ -142,7 +152,34 @@ class _SubscriptionsPageState extends State<SubscriptionsPage> {
                               ),
                               expandableContent: Container());
                         })),
-              )))
+              ))),
+      Row(children: [
+        Expanded(
+          child: NeumorphismContainer(
+            color: Theme.of(context).accentColor,
+            tapable: true,
+            onTap: () {
+              Navigator.of(context, rootNavigator: true)
+                  .push(MaterialPageRoute(builder: (_) => Subscription()));
+            },
+            mainContent: Center(
+              child: Text(
+                'New subscription',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            expandableContent: Container(),
+            expandable: false,
+          ),
+        ),
+      ]),
+      Container(
+        height: 25,
+      ),
     ])));
   }
 }

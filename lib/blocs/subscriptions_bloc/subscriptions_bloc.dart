@@ -11,7 +11,7 @@ part 'subscriptions_state.dart';
 class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
   SubscriptionsBloc() : super(SubscriptionsInitial());
   final int limit = 50;
-  List<Subscription> subscriptions = [];
+  List<SubscriptionModel> subscriptions = [];
   bool hasReachedMax = false;
   int? nextPageKey;
 
@@ -22,7 +22,7 @@ class SubscriptionsBloc extends Bloc<SubscriptionsEvent, SubscriptionsState> {
     if (event is FetchSubscriptions) {
       yield IsLoading(isLoading: true);
       try {
-        List<Subscription> newSubscriptions = await hc.getSubscriptions(
+        List<SubscriptionModel> newSubscriptions = await hc.getSubscriptions(
             username: event.username, pageKey: event.pageKey, limit: limit);
 
         subscriptions = [...subscriptions, ...newSubscriptions];

@@ -17,6 +17,11 @@ const List HIVENODES = [
 const String HBDNAI = '@@000000013';
 const String HIVENAI = '@@000000021';
 
+const num HOURSPERDAY = 24;
+const num HOURSPERWEEK = 168;
+const num HOURSPERMONTH = 730;
+const num HOURSPERYEAR = 8760;
+
 final HiveCalls hc = HiveCalls();
 
 final myColors = MyColors();

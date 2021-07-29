@@ -1,4 +1,4 @@
-class Subscription {
+class SubscriptionModel {
   String username;
   String profilepic;
   num amount;
@@ -8,7 +8,7 @@ class Subscription {
   String memo;
   String reccurenceString;
 
-  Subscription(
+  SubscriptionModel(
       {required this.username,
       required this.profilepic,
       required this.amount,

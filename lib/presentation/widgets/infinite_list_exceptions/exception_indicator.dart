@@ -49,7 +49,10 @@ class ExceptionIndicator extends StatelessWidget {
                   child: GestureDetector(
                     child: ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                          primary: Theme.of(context).accentColor),
+                          primary: Theme.of(context).accentColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          )),
                       onPressed: onTryAgain,
                       icon: const Icon(
                         Icons.refresh,

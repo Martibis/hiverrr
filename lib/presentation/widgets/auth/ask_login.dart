@@ -26,7 +26,6 @@ class _AskLoginState extends State<AskLogin> {
   late AuthBloc authBloc;
   Future<bool> _termsOfServiceAccepted() async {
     String? acceptedTos = await STORAGE.read(key: 'tos');
-    print(acceptedTos);
     if (acceptedTos == 'yes') {
       return true;
     } else {
@@ -150,7 +149,6 @@ class _AskLoginState extends State<AskLogin> {
                                         'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
                                     onPageStarted: (url) {
                                       Uri uri = Uri.parse(url);
-                                      print(uri.queryParameters);
                                       if (uri.queryParameters
                                               .containsKey('access_token') &&
                                           uri.queryParameters
@@ -225,7 +223,6 @@ class _AskLoginState extends State<AskLogin> {
                                           'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
                                       onPageStarted: (url) {
                                         Uri uri = Uri.parse(url);
-                                        print(uri.queryParameters);
                                         if (uri.queryParameters
                                                 .containsKey('access_token') &&
                                             uri.queryParameters

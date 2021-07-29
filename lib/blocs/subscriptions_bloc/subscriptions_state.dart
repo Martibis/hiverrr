@@ -19,7 +19,7 @@ class IsError extends SubscriptionsState {
 }
 
 class IsLoaded extends SubscriptionsState {
-  final List<Subscription> subscriptions;
+  final List<SubscriptionModel> subscriptions;
   final bool hasReachedMax;
   final int? nextPageKey;
 

@@ -77,8 +77,6 @@ class HiveCalls {
             ['received_vesting_shares']['amount']))! /
         (pow(10, receivedVestsPrecision!));
 
-    // print(data2);
-
     num totalVestingFundHive =
         num.tryParse(data2['result']['total_vesting_fund_hive']['amount']!)! /
             (pow(10, data2['result']['total_vesting_fund_hive']['precision']!));
@@ -182,12 +180,10 @@ class HiveCalls {
         host: 'hivesigner.com',
         path: '/sign/' + type,
         queryParameters: params);
-
-    print(uri);
     return uri;
   }
 
-  Future<List<Subscription>> getSubscriptions(
+  Future<List<SubscriptionModel>> getSubscriptions(
       {required String username,
       required int pageKey,
       required int limit}) async {
@@ -202,14 +198,11 @@ class HiveCalls {
                 '}, "id": 1}');
     Map data = await jsonDecode(r.body);
 
-    print(data);
-
-    List<Subscription> subscriptions = [];
+    List<SubscriptionModel> subscriptions = [];
 
     for (int i = 0; i < data['result']['recurrent_transfers'].length; i++) {
-      Map subscriptionMap = data['result']['recurrent_transfers'][0];
+      Map subscriptionMap = data['result']['recurrent_transfers'][i];
 
-      print(subscriptionMap);
       String username = subscriptionMap['to'];
       String profilepic = 'https://images.ecency.com/webp/u/' +
           subscriptionMap['to'] +
@@ -225,21 +218,21 @@ class HiveCalls {
       String recurrenceString =
           'every ' + recurrence.toStringAsFixed(0) + ' hours';
       switch (recurrence) {
-        case 24:
+        case HOURSPERDAY:
           recurrenceString = 'Daily';
           break;
-        case 168:
+        case HOURSPERWEEK:
           recurrenceString = 'Weekly';
           break;
-        case 730:
+        case HOURSPERMONTH:
           recurrenceString = 'Monthly';
           break;
-        case 8760:
+        case HOURSPERYEAR:
           recurrenceString = 'Yearly';
       }
       num remainingExecutions = subscriptionMap['remaining_executions'];
 
-      Subscription subscription = Subscription(
+      SubscriptionModel subscription = SubscriptionModel(
           username: username,
           profilepic: profilepic,
           amount: amount,
@@ -277,19 +270,6 @@ class HiveCalls {
       String txNai = tx['value']['amount']['nai'];
       String txMemo = tx['value']['memo'];
 
-      print("TX");
-      print(txUsername);
-      print(txAmount);
-      print(txPrecision);
-      print(txNai);
-      print(txMemo);
-
-      print('PASSED');
-      print(username);
-      print(amount);
-      print(memo);
-      print(nai);
-
       if (txUsername == username &&
           (num.parse(txAmount) / (pow(10, txPrecision))) == num.parse(amount) &&
           txNai == nai &&
@@ -297,7 +277,6 @@ class HiveCalls {
         isReceived = true;
       }
     }
-    print(isReceived);
     return isReceived;
   }
 }

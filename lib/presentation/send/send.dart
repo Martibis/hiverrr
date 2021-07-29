@@ -57,7 +57,6 @@ class _SendPageState extends State<SendPage> {
   }
 
   confirmTransaction(String url) {
-    print(url);
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
     BotToast.showAnimationWidget(
         clickClose: false,
@@ -109,7 +108,6 @@ class _SendPageState extends State<SendPage> {
                                 initialUrl: url.toString(),
                                 onPageStarted: (url) {
                                   Uri uri = Uri.parse(url);
-                                  print(uri.toString());
                                   //this means succesful transfer
                                   if (uri.host.contains('hiverrr')) {
                                     BotToast.showText(
@@ -131,7 +129,6 @@ class _SendPageState extends State<SendPage> {
                                 onProgress: (progress) async {
                                   String? url =
                                       await webViewController!.currentUrl();
-                                  print(url);
                                   if (url == 'https://hivesigner.com/' ||
                                       url == 'https://hivesigner.com') {
                                     cancel();

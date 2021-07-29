@@ -14,6 +14,6 @@ class EmptyListIndicator extends StatelessWidget {
   Widget build(BuildContext context) => ExceptionIndicator(
         title: title,
         message: message,
-        onTryAgain: () {},
+        onTryAgain: null,
       );
 }

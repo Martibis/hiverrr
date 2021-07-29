@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/authbloc/auth_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
-import 'package:hiverrr/data/hive_calls/hive_calls.dart';
 import 'package:hiverrr/presentation/receive/receive_final.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
@@ -212,7 +211,6 @@ class _ReceivePageState extends State<ReceivePage> {
                                 Uri uri = hc.getHivesignerSignUrl(
                                     type: 'transfer', params: op);
 
-                                print(uri);
                                 if (FocusScope.of(context).isFirstFocus) {
                                   FocusScope.of(context)
                                       .requestFocus(new FocusNode());

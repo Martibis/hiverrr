@@ -217,7 +217,6 @@ class _MyHomePageState extends State<MyHomePage> {
                               'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
                           onPageStarted: (url) {
                             Uri uri = Uri.parse(url);
-                            print(uri.queryParameters);
                             if (uri.queryParameters
                                     .containsKey('access_token') &&
                                 uri.queryParameters.containsKey('username')) {
