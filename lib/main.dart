@@ -52,6 +52,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     //authBloc.add(TryLogInFromToken());
+    print('OH YEEEEP IT IS INITIALIZING AGAIN');
     super.initState();
   }
 
@@ -113,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
         expand: false,
         context: context,
         backgroundColor: Colors.transparent,
-        builder: (context) {
+        builder: (_) {
           List<Widget> columnItems = [];
 
           columnItems.add(GestureDetector(
@@ -133,7 +134,80 @@ class _MyHomePageState extends State<MyHomePage> {
               behavior: HitTestBehavior.translucent,
               onTap: () {
                 Navigator.of(context, rootNavigator: true).pop();
-                changeAccount();
+                if (Platform.isAndroid)
+                  WebView.platform = SurfaceAndroidWebView();
+                BotToast.showAnimationWidget(
+                    clickClose: false,
+                    allowClick: false,
+                    onlyOne: true,
+                    crossPage: true,
+                    enableKeyboardSafeArea: true,
+                    backButtonBehavior: BackButtonBehavior.close,
+                    wrapToastAnimation: (controller, cancel, child) => Stack(
+                          children: <Widget>[
+                            GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                cancel();
+                              },
+                              //The DecoratedBox here is very important,he will fill the entire parent component
+                              child: AnimatedBuilder(
+                                builder: (_, child) => Opacity(
+                                  opacity: controller.value,
+                                  child: child,
+                                ),
+                                child: DecoratedBox(
+                                  decoration:
+                                      BoxDecoration(color: myColors.black90),
+                                  child: SizedBox.expand(),
+                                ),
+                                animation: controller,
+                              ),
+                            ),
+                            SafeArea(
+                              child: Container(
+                                padding: EdgeInsets.only(top: 50),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10)),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10))),
+                                    child: WebView(
+                                      javascriptMode:
+                                          JavascriptMode.unrestricted,
+                                      initialUrl:
+                                          'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
+                                      onPageStarted: (url) {
+                                        print('OR AT LEAST HERE');
+                                        Uri uri = Uri.parse(url);
+                                        if (uri.queryParameters
+                                                .containsKey('access_token') &&
+                                            uri.queryParameters
+                                                .containsKey('username')) {
+                                          String? username =
+                                              uri.queryParameters['username'];
+                                          BlocProvider.of<AuthBloc>(context)
+                                              .add(HiveLogin(
+                                                  username: username != null
+                                                      ? username
+                                                      : ''));
+                                          print('CAN WE GET HERE?');
+                                          cancel();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                    toastBuilder: (cancelFunc) => AlertDialog(),
+                    animationDuration: Duration(milliseconds: 0));
               },
               child: Container(
                 padding: myEdgeInsets.bottomLeftRight,
@@ -172,74 +246,6 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  changeAccount() {
-    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-    BotToast.showAnimationWidget(
-        clickClose: false,
-        allowClick: false,
-        onlyOne: true,
-        crossPage: true,
-        enableKeyboardSafeArea: true,
-        backButtonBehavior: BackButtonBehavior.close,
-        wrapToastAnimation: (controller, cancel, child) => Stack(
-              children: <Widget>[
-                GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    cancel();
-                  },
-                  //The DecoratedBox here is very important,he will fill the entire parent component
-                  child: AnimatedBuilder(
-                    builder: (_, child) => Opacity(
-                      opacity: controller.value,
-                      child: child,
-                    ),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(color: myColors.black90),
-                      child: SizedBox.expand(),
-                    ),
-                    animation: controller,
-                  ),
-                ),
-                SafeArea(
-                  child: Container(
-                    padding: EdgeInsets.only(top: 50),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10)),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10))),
-                        child: WebView(
-                          javascriptMode: JavascriptMode.unrestricted,
-                          initialUrl:
-                              'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
-                          onPageStarted: (url) {
-                            Uri uri = Uri.parse(url);
-                            if (uri.queryParameters
-                                    .containsKey('access_token') &&
-                                uri.queryParameters.containsKey('username')) {
-                              String? username =
-                                  uri.queryParameters['username'];
-                              BlocProvider.of<AuthBloc>(context).add(HiveLogin(
-                                  username: username != null ? username : ''));
-                              cancel();
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-        toastBuilder: (cancelFunc) => AlertDialog(),
-        animationDuration: Duration(milliseconds: 0));
-  }
-
   @override
   void initState() {
     super.initState();
@@ -248,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: SafeArea(child: BlocBuilder<AuthBloc, AuthState>(
-      builder: (_, state) {
+      builder: (context, state) {
         if (state is LoggedIn) {
           return Container(
             child: RefreshIndicator(
@@ -259,6 +265,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView(
                 physics: AlwaysScrollableScrollPhysics(),
                 children: [
+                  //FOR TESTING
+                  /* GestureDetector(
+                    onTap: () {
+                      print('here');
+                      BlocProvider.of<AuthBloc>(context).add(LogOut());
+                    },
+                    child: Text('Log out'),
+                  ), */
                   Container(
                     height: 25,
                   ),

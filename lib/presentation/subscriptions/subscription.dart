@@ -86,8 +86,10 @@ class _SubscriptionState extends State<Subscription> {
                                   if (uri.host.contains('hiverrr')) {
                                     BotToast.showText(
                                       crossPage: true,
-                                      text: isCancel
-                                          ? "Subscription canceled"
+                                      text: widget.changingSubscription
+                                          ? (isCancel
+                                              ? "Subscription canceled"
+                                              : "Succesfully updated! 🤩")
                                           : "Succesfully subscribed! 🤩",
                                       textStyle: TextStyle(color: Colors.white),
                                       borderRadius: BorderRadius.circular(4),
