@@ -23,14 +23,18 @@ class HiveCalls {
           body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
               username +
               '", "start":-1, "limit":250, "operation_filter_low": 4503599627370496}, "id": 1}'),
+      /*  http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+          body:
+              '{"jsonrpc":"2.0", "method":"database_api.get_current_price_feed", "id":1}'), */
       http.post(Uri(scheme: 'https', host: HIVENODES[1]),
           body:
-              '{"jsonrpc":"2.0", "method":"database_api.get_current_price_feed", "id":1}')
+              '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}')
     ]));
     Map data = await jsonDecode(results[0].body);
     Map data2 = await jsonDecode(results[1].body);
     Map data3 = await jsonDecode(results[2].body);
-    Map data4 = await jsonDecode(results[3].body);
+    /* Map data4 = await jsonDecode(results[3].body); */
+    Map data5 = await jsonDecode(results[3].body);
 
     int? hbdPrecision =
         data['result']['accounts'][0]['hbd_balance']['precision'];
@@ -144,8 +148,9 @@ class HiveCalls {
     num curationInterest =
         ((curationRewards / ownedVestsBalance) * times) * 100;
 
-    num hivePrice = (num.tryParse(data4['result']['base']['amount'])! /
-        pow(10, data4['result']['base']['precision']));
+    num hivePrice = (num.tryParse(
+            data5['result']['current_max_history']['base']['amount'])! /
+        pow(10, data5['result']['current_max_history']['base']['precision']));
 
     num estimatedUsdValue = hbdBalance +
         (hiveBalance * hivePrice) +
@@ -262,10 +267,8 @@ class HiveCalls {
             '", "start":-1, "limit":1, "operation_filter_low": 100}, "id": 1}');
     Map data = await jsonDecode(r.body);
 
-    /*    d.log(data['result']['history'].toString()); */
     bool isReceived = false;
     for (int i = 0; i < data['result']['history'].length; i++) {
-      d.log(data['result']['history'][i].toString());
       Map tx = data['result']['history'][i][1]['op'];
 
       String txUsername = tx['value']['to'];

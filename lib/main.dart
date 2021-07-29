@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +17,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:recase/recase.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'blocs/authbloc/auth_bloc.dart';
 import 'blocs/theming_bloc/theming_bloc.dart';
@@ -101,6 +104,141 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  showUserOptions({required String username}) {
+    showMaterialModalBottomSheet(
+        useRootNavigator: true,
+        duration: Duration(milliseconds: 150),
+        expand: false,
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (context) {
+          List<Widget> columnItems = [];
+
+          columnItems.add(GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                BlocProvider.of<AuthBloc>(context).add(LogOut());
+              },
+              child: Container(
+                padding: myEdgeInsets.bottomLeftRight,
+                child: Text(
+                  'Log out',
+                ),
+              )));
+
+          columnItems.add(GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                changeAccount();
+              },
+              child: Container(
+                padding: myEdgeInsets.bottomLeftRight,
+                child: Text(
+                  'Switch account',
+                ),
+              )));
+
+          columnItems.add(GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                Navigator.of(context, rootNavigator: true).pop();
+                launch('https://peakd.com/@' + username);
+              },
+              child: Container(
+                padding: myEdgeInsets.bottomLeftRight,
+                child: Text(
+                  'Vist profile',
+                ),
+              )));
+
+          return Container(
+            decoration: BoxDecoration(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10))),
+            padding: EdgeInsets.only(top: 20),
+            child: Column(
+              //mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: columnItems,
+            ),
+          );
+        });
+  }
+
+  changeAccount() {
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    BotToast.showAnimationWidget(
+        clickClose: false,
+        allowClick: false,
+        onlyOne: true,
+        crossPage: true,
+        enableKeyboardSafeArea: true,
+        backButtonBehavior: BackButtonBehavior.close,
+        wrapToastAnimation: (controller, cancel, child) => Stack(
+              children: <Widget>[
+                GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    cancel();
+                  },
+                  //The DecoratedBox here is very important,he will fill the entire parent component
+                  child: AnimatedBuilder(
+                    builder: (_, child) => Opacity(
+                      opacity: controller.value,
+                      child: child,
+                    ),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: myColors.black90),
+                      child: SizedBox.expand(),
+                    ),
+                    animation: controller,
+                  ),
+                ),
+                SafeArea(
+                  child: Container(
+                    padding: EdgeInsets.only(top: 50),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10))),
+                        child: WebView(
+                          javascriptMode: JavascriptMode.unrestricted,
+                          initialUrl:
+                              'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
+                          onPageStarted: (url) {
+                            Uri uri = Uri.parse(url);
+                            print(uri.queryParameters);
+                            if (uri.queryParameters
+                                    .containsKey('access_token') &&
+                                uri.queryParameters.containsKey('username')) {
+                              String? username =
+                                  uri.queryParameters['username'];
+                              BlocProvider.of<AuthBloc>(context).add(HiveLogin(
+                                  username: username != null ? username : ''));
+                              cancel();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+        toastBuilder: (cancelFunc) => AlertDialog(),
+        animationDuration: Duration(milliseconds: 0));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -134,64 +272,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           borderRadius: BorderRadius.all(Radius.circular(100)),
                           color: Theme.of(context).backgroundColor,
                           onTap: () {
-                            showMaterialModalBottomSheet(
-                                useRootNavigator: true,
-                                duration: Duration(milliseconds: 150),
-                                expand: false,
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) {
-                                  List<Widget> columnItems = [];
-
-                                  columnItems.add(GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () {
-                                        Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop();
-                                        BlocProvider.of<AuthBloc>(context)
-                                            .add(LogOut());
-                                      },
-                                      child: Container(
-                                        padding: myEdgeInsets.bottomLeftRight,
-                                        child: Text(
-                                          'Log out',
-                                        ),
-                                      )));
-
-                                  columnItems.add(GestureDetector(
-                                      behavior: HitTestBehavior.translucent,
-                                      onTap: () {
-                                        Navigator.of(context,
-                                                rootNavigator: true)
-                                            .pop();
-                                        launch('https://peakd.com/@' +
-                                            state.user.username);
-                                      },
-                                      child: Container(
-                                        padding: myEdgeInsets.bottomLeftRight,
-                                        child: Text(
-                                          'Vist profile',
-                                        ),
-                                      )));
-
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                        color:
-                                            Theme.of(context).backgroundColor,
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10))),
-                                    padding: EdgeInsets.only(top: 20),
-                                    child: Column(
-                                      //mainAxisAlignment: MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: columnItems,
-                                    ),
-                                  );
-                                });
+                            showUserOptions(username: state.user.username);
                           },
                           mainContent: Container(
                             /*      height: 50,
@@ -216,61 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).backgroundColor,
                         tapable: true,
                         onTap: () {
-                          showMaterialModalBottomSheet(
-                              useRootNavigator: true,
-                              duration: Duration(milliseconds: 150),
-                              expand: false,
-                              context: context,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) {
-                                List<Widget> columnItems = [];
-
-                                columnItems.add(GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () {
-                                      Navigator.of(context, rootNavigator: true)
-                                          .pop();
-                                      BlocProvider.of<AuthBloc>(context)
-                                          .add(LogOut());
-                                    },
-                                    child: Container(
-                                      padding: myEdgeInsets.bottomLeftRight,
-                                      child: Text(
-                                        'Log out',
-                                      ),
-                                    )));
-
-                                columnItems.add(GestureDetector(
-                                    behavior: HitTestBehavior.translucent,
-                                    onTap: () {
-                                      Navigator.of(context, rootNavigator: true)
-                                          .pop();
-                                      launch('https://peakd.com/@' +
-                                          state.user.username);
-                                    },
-                                    child: Container(
-                                      padding: myEdgeInsets.bottomLeftRight,
-                                      child: Text(
-                                        'Vist profile',
-                                      ),
-                                    )));
-
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).backgroundColor,
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10))),
-                                  padding: EdgeInsets.only(top: 20),
-                                  child: Column(
-                                    //mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: columnItems,
-                                  ),
-                                );
-                              });
+                          showUserOptions(username: state.user.username);
                         },
                         mainContent: Center(
                           child: Text(
