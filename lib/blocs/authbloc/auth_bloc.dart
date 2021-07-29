@@ -16,7 +16,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthEvent event,
   ) async* {
     if (event is LogOut) {
-      print("LOGGING OUT AFTER POP AND PROVIDER IN EVENT?");
       STORAGE.delete(key: 'hive-username');
       //STORAGE.delete(key: 'tos');
       yield InitialState();
@@ -43,7 +42,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     if (event is HiveLogin) {
       yield Loading(isLoading: true);
-      print("WE DO GET TO LOGGED IN EVENT?");
       try {
         await STORAGE.write(key: 'hive-username', value: event.username);
         User u = User(

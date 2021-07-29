@@ -178,225 +178,218 @@ class _ManualTransferState extends State<ManualTransfer> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => BlocProvider.of<AuthBloc>(context))
-      ],
-      child: Scaffold(
-        body: SafeArea(
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is LoggedIn) {
-                return Form(
-                  key: _sendFormKey,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          physics: BouncingScrollPhysics(),
-                          children: [
-                            ScreenHeader(
-                                title: 'Manual transfer', hasBackButton: true),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    color: isHive
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        if (!isHive) {
-                                          isHive = !isHive;
-                                        }
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'hive',
-                                      style: TextStyle(
-                                          color: isHive
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
+    return Scaffold(
+      body: SafeArea(
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is LoggedIn) {
+              return Form(
+                key: _sendFormKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        physics: BouncingScrollPhysics(),
+                        children: [
+                          ScreenHeader(
+                              title: 'Manual transfer', hasBackButton: true),
+                          Row(
+                            children: [
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                  color: isHive
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      if (!isHive) {
+                                        isHive = !isHive;
+                                      }
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'hive',
+                                    style: TextStyle(
+                                        color: isHive
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
+                                  expandableContent: Container(),
+                                  expandable: false,
                                 ),
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    color: !isHive
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        if (isHive) {
-                                          isHive = !isHive;
-                                        }
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'hbd',
-                                      style: TextStyle(
-                                          color: !isHive
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
+                              ),
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                  color: !isHive
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      if (isHive) {
+                                        isHive = !isHive;
+                                      }
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'hbd',
+                                    style: TextStyle(
+                                        color: !isHive
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _usernameController,
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                validator: validateUsername,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  hintText: '@username',
-                                ),
-                                //textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _amountController,
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                validator: validateNotEmpty,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r"[0-9.]")),
-                                  TextInputFormatter.withFunction(
-                                      (oldValue, newValue) {
-                                    try {
-                                      final text = newValue.text;
-                                      if (text.isNotEmpty) double.parse(text);
-                                      return newValue;
-                                    } catch (e) {
-                                      //TODO
-                                    }
-                                    return oldValue;
-                                  }),
-                                ],
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: '10.00',
-                                ),
-                                //textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _memoController,
-                                minLines: 6,
-                                maxLines: 6,
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  hintText: 'memo',
-                                ),
-                                //textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(children: [
-                        Expanded(
-                          child: NeumorphismContainer(
-                            color: Theme.of(context).accentColor,
-                            tapable: true,
-                            onTap: () {
-                              if (_validInputs()) {
-                                Map<String, dynamic> op = {
-                                  "from": '__signer',
-                                  "to": _usernameController.text
-                                      .replaceAll('@', ''),
-                                  "amount": _amountController.text +
-                                      (isHive ? ' HIVE' : ' HBD'),
-                                  "memo": _memoController.text,
-                                  "redirect_uri": 'https://hiverrr.com'
-                                };
-                                Uri uri = hc.getHivesignerSignUrl(
-                                    type: 'transfer', params: op);
-
-                                if (FocusScope.of(context).isFirstFocus) {
-                                  FocusScope.of(context)
-                                      .requestFocus(new FocusNode());
-                                }
-                                confirmTransaction(uri.toString());
-                              }
-                            },
-                            mainContent: Center(
-                              child: Text(
-                                'Continue',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                                  expandableContent: Container(),
+                                  expandable: false,
                                 ),
                               ),
-                            ),
-                            expandableContent: Container(),
-                            expandable: false,
+                              Container(
+                                width: 25,
+                              ),
+                            ],
                           ),
-                        ),
-                      ]),
-                      Container(
-                        height: 25,
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _usernameController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateUsername,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                hintText: '@username',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _amountController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateNotEmpty,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r"[0-9.]")),
+                                TextInputFormatter.withFunction(
+                                    (oldValue, newValue) {
+                                  try {
+                                    final text = newValue.text;
+                                    if (text.isNotEmpty) double.parse(text);
+                                    return newValue;
+                                  } catch (e) {
+                                    //TODO
+                                  }
+                                  return oldValue;
+                                }),
+                              ],
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: '10.00',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _memoController,
+                              minLines: 6,
+                              maxLines: 6,
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
+                                hintText: 'memo',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }
-              if (state is Loading) {
-                return Text('Loading');
-              }
-              return AskLogin();
-            },
-          ),
+                    ),
+                    Row(children: [
+                      Expanded(
+                        child: NeumorphismContainer(
+                          color: Theme.of(context).accentColor,
+                          tapable: true,
+                          onTap: () {
+                            if (_validInputs()) {
+                              Map<String, dynamic> op = {
+                                "from": '__signer',
+                                "to": _usernameController.text
+                                    .replaceAll('@', ''),
+                                "amount": _amountController.text +
+                                    (isHive ? ' HIVE' : ' HBD'),
+                                "memo": _memoController.text,
+                                "redirect_uri": 'https://hiverrr.com'
+                              };
+                              Uri uri = hc.getHivesignerSignUrl(
+                                  type: 'transfer', params: op);
+
+                              if (FocusScope.of(context).isFirstFocus) {
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
+                              }
+                              confirmTransaction(uri.toString());
+                            }
+                          },
+                          mainContent: Center(
+                            child: Text(
+                              'Continue',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          expandableContent: Container(),
+                          expandable: false,
+                        ),
+                      ),
+                    ]),
+                    Container(
+                      height: 25,
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state is Loading) {
+              return Text('Loading');
+            }
+            return AskLogin();
+          },
         ),
       ),
     );

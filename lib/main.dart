@@ -47,12 +47,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  //AuthBloc authBloc = AuthBloc();
   bool light = true;
   @override
   void initState() {
-    //authBloc.add(TryLogInFromToken());
-    print('OH YEEEEP IT IS INITIALIZING AGAIN');
     super.initState();
   }
 
@@ -182,7 +179,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                       initialUrl:
                                           'https://hivesigner.com/oauth2/authorize?client_id=hiverrr&redirect_uri=https%3A%2F%2Fhiverrr.com&scope=login',
                                       onPageStarted: (url) {
-                                        print('OR AT LEAST HERE');
                                         Uri uri = Uri.parse(url);
                                         if (uri.queryParameters
                                                 .containsKey('access_token') &&
@@ -195,7 +191,6 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   username: username != null
                                                       ? username
                                                       : ''));
-                                          print('CAN WE GET HERE?');
                                           cancel();
                                         }
                                       },
@@ -265,14 +260,6 @@ class _MyHomePageState extends State<MyHomePage> {
               child: ListView(
                 physics: AlwaysScrollableScrollPhysics(),
                 children: [
-                  //FOR TESTING
-                  /* GestureDetector(
-                    onTap: () {
-                      print('here');
-                      BlocProvider.of<AuthBloc>(context).add(LogOut());
-                    },
-                    child: Text('Log out'),
-                  ), */
                   Container(
                     height: 25,
                   ),

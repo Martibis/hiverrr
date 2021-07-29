@@ -186,442 +186,433 @@ class _SubscriptionState extends State<Subscription> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => BlocProvider.of<AuthBloc>(context))
-      ],
-      child: Scaffold(
-        body: SafeArea(
-          child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, state) {
-              if (state is LoggedIn) {
-                return Form(
-                  key: _subscriptionFormKey,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          physics: BouncingScrollPhysics(),
-                          children: [
-                            ScreenHeader(
-                                title: widget.changingSubscription
-                                    ? 'Update subscription'
-                                    : 'New subscription',
-                                hasBackButton: true),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    color: isHive
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        if (!isHive) {
-                                          isHive = !isHive;
-                                        }
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'hive',
-                                      style: TextStyle(
-                                          color: isHive
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding:
-                                        EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                    color: !isHive
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        if (isHive) {
-                                          isHive = !isHive;
-                                        }
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'hbd',
-                                      style: TextStyle(
-                                          color: !isHive
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _usernameController,
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                validator: validateUsername,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  hintText: '@username',
-                                ),
-                                //textAlign: TextAlign.center,
+    return Scaffold(
+      body: SafeArea(
+        child: BlocBuilder<AuthBloc, AuthState>(
+          builder: (context, state) {
+            if (state is LoggedIn) {
+              return Form(
+                key: _subscriptionFormKey,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView(
+                        physics: BouncingScrollPhysics(),
+                        children: [
+                          ScreenHeader(
+                              title: widget.changingSubscription
+                                  ? 'Update subscription'
+                                  : 'New subscription',
+                              hasBackButton: true),
+                          Row(
+                            children: [
+                              Container(
+                                width: 25,
                               ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _amountController,
-                                autovalidateMode:
-                                    AutovalidateMode.onUserInteraction,
-                                validator: validateNotEmpty,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r"[0-9.]")),
-                                  TextInputFormatter.withFunction(
-                                      (oldValue, newValue) {
-                                    try {
-                                      final text = newValue.text;
-                                      if (text.isNotEmpty) double.parse(text);
-                                      return newValue;
-                                    } catch (e) {
-                                      //TODO
-                                    }
-                                    return oldValue;
-                                  }),
-                                ],
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: '10.00',
-                                ),
-                                //textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Container(
-                              padding: myEdgeInsets.leftRight,
-                              child: TextFormField(
-                                controller: _memoController,
-                                minLines: 6,
-                                maxLines: 6,
-                                keyboardType: TextInputType.text,
-                                decoration: InputDecoration(
-                                  hintText: 'memo',
-                                ),
-                                //textAlign: TextAlign.center,
-                              ),
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                    color: recurrence == HOURSPERDAY
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        recurrence = HOURSPERDAY;
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'daily',
-                                      style: TextStyle(
-                                          color: recurrence == HOURSPERDAY
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                    color: recurrence == HOURSPERWEEK
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        recurrence = HOURSPERWEEK;
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'weekly',
-                                      style: TextStyle(
-                                          color: recurrence == HOURSPERWEEK
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                    color: recurrence == HOURSPERMONTH
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        recurrence = HOURSPERMONTH;
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'monthly',
-                                      style: TextStyle(
-                                          color: recurrence == HOURSPERMONTH
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                                Expanded(
-                                  child: NeumorphismContainer(
-                                    margin: EdgeInsets.all(0),
-                                    padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
-                                    color: recurrence == HOURSPERYEAR
-                                        ? Theme.of(context).accentColor
-                                        : Theme.of(context).backgroundColor,
-                                    onTap: () {
-                                      setState(() {
-                                        recurrence = HOURSPERYEAR;
-                                      });
-                                    },
-                                    mainContent: Text(
-                                      'yearly',
-                                      style: TextStyle(
-                                          color: recurrence == HOURSPERYEAR
-                                              ? Colors.white
-                                              : Theme.of(context)
-                                                  .textTheme
-                                                  .bodyText1!
-                                                  .color,
-                                          fontWeight: FontWeight.bold),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    expandableContent: Container(),
-                                    expandable: false,
-                                  ),
-                                ),
-                                Container(
-                                  width: 25,
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 25,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(children: [
-                        Container(
-                          width: 25,
-                        ),
-                        widget.changingSubscription
-                            ? Expanded(
+                              Expanded(
                                 child: NeumorphismContainer(
                                   margin: EdgeInsets.all(0),
-                                  color: Theme.of(context).backgroundColor,
-                                  tapable: true,
+                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                  color: isHive
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
                                   onTap: () {
-                                    if (_validInputs()) {
-                                      Map<String, dynamic> op = {
-                                        "from": '__signer',
-                                        "to": _usernameController.text
-                                            .replaceAll('@', ''),
-                                        "amount": 0.00.toString() +
-                                            (isHive ? ' HIVE' : ' HBD'),
-                                        "memo": '',
-                                        "recurrence": 24.toString(),
-                                        "executions": 2.toString(),
-                                        "redirect_uri": 'https://hiverrr.com'
-                                      };
-
-                                      Uri uri = hc.getHivesignerSignUrl(
-                                          type: 'recurrent_transfer',
-                                          params: op);
-
-                                      if (FocusScope.of(context).isFirstFocus) {
-                                        FocusScope.of(context)
-                                            .requestFocus(new FocusNode());
+                                    setState(() {
+                                      if (!isHive) {
+                                        isHive = !isHive;
                                       }
-                                      confirmTransaction(
-                                          url: uri.toString(), isCancel: true);
-                                    }
+                                    });
                                   },
-                                  mainContent: Center(
-                                    child: Text(
-                                      'Cancel',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .bodyText2!
-                                            .color,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                  mainContent: Text(
+                                    'hive',
+                                    style: TextStyle(
+                                        color: isHive
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
                                   ),
                                   expandableContent: Container(),
                                   expandable: false,
                                 ),
-                              )
-                            : Container(),
-                        widget.changingSubscription
-                            ? Container(
+                              ),
+                              Container(
                                 width: 25,
-                              )
-                            : Container(),
-                        Expanded(
-                          child: NeumorphismContainer(
-                            margin: EdgeInsets.all(0),
-                            color: Theme.of(context).accentColor,
-                            tapable: true,
-                            onTap: () {
-                              if (_validInputs()) {
-                                Map<String, dynamic> op = {
-                                  "from": '__signer',
-                                  "to": _usernameController.text
-                                      .replaceAll('@', ''),
-                                  "amount": _amountController.text +
-                                      (isHive ? ' HIVE' : ' HBD'),
-                                  "memo": _memoController.text,
-                                  "recurrence": recurrence.toString(),
-                                  "executions":
-                                      (((HOURSPERYEAR * 2) / recurrence)
-                                                  .floor() -
-                                              1)
-                                          .toString(),
-                                  "redirect_uri": 'https://hiverrr.com'
-                                };
-
-                                Uri uri = hc.getHivesignerSignUrl(
-                                    type: 'recurrent_transfer', params: op);
-
-                                if (FocusScope.of(context).isFirstFocus) {
-                                  FocusScope.of(context)
-                                      .requestFocus(new FocusNode());
-                                }
-                                confirmTransaction(url: uri.toString());
-                              }
-                            },
-                            mainContent: Center(
-                              child: Text(
-                                'Continue',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                  color: !isHive
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      if (isHive) {
+                                        isHive = !isHive;
+                                      }
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'hbd',
+                                    style: TextStyle(
+                                        color: !isHive
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  expandableContent: Container(),
+                                  expandable: false,
                                 ),
                               ),
-                            ),
-                            expandableContent: Container(),
-                            expandable: false,
+                              Container(
+                                width: 25,
+                              ),
+                            ],
                           ),
-                        ),
-                        Container(
-                          width: 25,
-                        ),
-                      ]),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _usernameController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateUsername,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                hintText: '@username',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _amountController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateNotEmpty,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r"[0-9.]")),
+                                TextInputFormatter.withFunction(
+                                    (oldValue, newValue) {
+                                  try {
+                                    final text = newValue.text;
+                                    if (text.isNotEmpty) double.parse(text);
+                                    return newValue;
+                                  } catch (e) {
+                                    //TODO
+                                  }
+                                  return oldValue;
+                                }),
+                              ],
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                hintText: '10.00',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _memoController,
+                              minLines: 6,
+                              maxLines: 6,
+                              keyboardType: TextInputType.text,
+                              decoration: InputDecoration(
+                                hintText: 'memo',
+                              ),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  color: recurrence == HOURSPERDAY
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      recurrence = HOURSPERDAY;
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'daily',
+                                    style: TextStyle(
+                                        color: recurrence == HOURSPERDAY
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  expandableContent: Container(),
+                                  expandable: false,
+                                ),
+                              ),
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  color: recurrence == HOURSPERWEEK
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      recurrence = HOURSPERWEEK;
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'weekly',
+                                    style: TextStyle(
+                                        color: recurrence == HOURSPERWEEK
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  expandableContent: Container(),
+                                  expandable: false,
+                                ),
+                              ),
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  color: recurrence == HOURSPERMONTH
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      recurrence = HOURSPERMONTH;
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'monthly',
+                                    style: TextStyle(
+                                        color: recurrence == HOURSPERMONTH
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  expandableContent: Container(),
+                                  expandable: false,
+                                ),
+                              ),
+                              Container(
+                                width: 25,
+                              ),
+                              Expanded(
+                                child: NeumorphismContainer(
+                                  margin: EdgeInsets.all(0),
+                                  padding: EdgeInsets.fromLTRB(5, 20, 5, 20),
+                                  color: recurrence == HOURSPERYEAR
+                                      ? Theme.of(context).accentColor
+                                      : Theme.of(context).backgroundColor,
+                                  onTap: () {
+                                    setState(() {
+                                      recurrence = HOURSPERYEAR;
+                                    });
+                                  },
+                                  mainContent: Text(
+                                    'yearly',
+                                    style: TextStyle(
+                                        color: recurrence == HOURSPERYEAR
+                                            ? Colors.white
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText1!
+                                                .color,
+                                        fontWeight: FontWeight.bold),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  expandableContent: Container(),
+                                  expandable: false,
+                                ),
+                              ),
+                              Container(
+                                width: 25,
+                              ),
+                            ],
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(children: [
                       Container(
-                        height: 10,
+                        width: 25,
+                      ),
+                      widget.changingSubscription
+                          ? Expanded(
+                              child: NeumorphismContainer(
+                                margin: EdgeInsets.all(0),
+                                color: Theme.of(context).backgroundColor,
+                                tapable: true,
+                                onTap: () {
+                                  if (_validInputs()) {
+                                    Map<String, dynamic> op = {
+                                      "from": '__signer',
+                                      "to": _usernameController.text
+                                          .replaceAll('@', ''),
+                                      "amount": 0.00.toString() +
+                                          (isHive ? ' HIVE' : ' HBD'),
+                                      "memo": '',
+                                      "recurrence": 24.toString(),
+                                      "executions": 2.toString(),
+                                      "redirect_uri": 'https://hiverrr.com'
+                                    };
+
+                                    Uri uri = hc.getHivesignerSignUrl(
+                                        type: 'recurrent_transfer', params: op);
+
+                                    if (FocusScope.of(context).isFirstFocus) {
+                                      FocusScope.of(context)
+                                          .requestFocus(new FocusNode());
+                                    }
+                                    confirmTransaction(
+                                        url: uri.toString(), isCancel: true);
+                                  }
+                                },
+                                mainContent: Center(
+                                  child: Text(
+                                    'Cancel',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2!
+                                          .color,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                expandableContent: Container(),
+                                expandable: false,
+                              ),
+                            )
+                          : Container(),
+                      widget.changingSubscription
+                          ? Container(
+                              width: 25,
+                            )
+                          : Container(),
+                      Expanded(
+                        child: NeumorphismContainer(
+                          margin: EdgeInsets.all(0),
+                          color: Theme.of(context).accentColor,
+                          tapable: true,
+                          onTap: () {
+                            if (_validInputs()) {
+                              Map<String, dynamic> op = {
+                                "from": '__signer',
+                                "to": _usernameController.text
+                                    .replaceAll('@', ''),
+                                "amount": _amountController.text +
+                                    (isHive ? ' HIVE' : ' HBD'),
+                                "memo": _memoController.text,
+                                "recurrence": recurrence.toString(),
+                                "executions":
+                                    (((HOURSPERYEAR * 2) / recurrence).floor() -
+                                            1)
+                                        .toString(),
+                                "redirect_uri": 'https://hiverrr.com'
+                              };
+
+                              Uri uri = hc.getHivesignerSignUrl(
+                                  type: 'recurrent_transfer', params: op);
+
+                              if (FocusScope.of(context).isFirstFocus) {
+                                FocusScope.of(context)
+                                    .requestFocus(new FocusNode());
+                              }
+                              confirmTransaction(url: uri.toString());
+                            }
+                          },
+                          mainContent: Center(
+                            child: Text(
+                              'Continue',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          expandableContent: Container(),
+                          expandable: false,
+                        ),
                       ),
                       Container(
-                        padding: myEdgeInsets.leftRight,
-                        child: Text(
-                          'Subscriptions are active for 2 years or until canceled.',
-                          style: TextStyle(fontSize: 13),
-                          textAlign: TextAlign.center,
-                        ),
+                        width: 25,
                       ),
-                      Container(
-                        height: 25,
+                    ]),
+                    Container(
+                      height: 10,
+                    ),
+                    Container(
+                      padding: myEdgeInsets.leftRight,
+                      child: Text(
+                        'Subscriptions are active for 2 years or until canceled.',
+                        style: TextStyle(fontSize: 13),
+                        textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
-                );
-              }
-              if (state is Loading) {
-                return Text('Loading');
-              }
-              return AskLogin();
-            },
-          ),
+                    ),
+                    Container(
+                      height: 25,
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state is Loading) {
+              return Text('Loading');
+            }
+            return AskLogin();
+          },
         ),
       ),
     );
