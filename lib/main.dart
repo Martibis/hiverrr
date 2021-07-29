@@ -7,9 +7,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/subscriptions_bloc/subscriptions_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
+import 'package:hiverrr/data/models/subscription_model.dart';
 import 'package:hiverrr/presentation/receive/receive.dart';
 import 'package:hiverrr/presentation/send/manual_transfer.dart';
 import 'package:hiverrr/presentation/send/send.dart';
+import 'package:hiverrr/presentation/subscriptions/subscription.dart';
 import 'package:hiverrr/presentation/subscriptions/subscriptions.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
@@ -1185,17 +1187,29 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).backgroundColor,
                         tapable: true,
                         onTap: () {
-                          Navigator.of(context, rootNavigator: true)
-                              .push(MaterialPageRoute(
-                                  builder: (_) => ManualTransfer(
+                          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                              builder: (_) => Subscription(
+                                  subscription: SubscriptionModel(
+                                      username: 'martibis',
+                                      memo:
+                                          'Thanks for buying me a coffee every month (:',
+                                      profilepic:
+                                          'https://images.ecency.com/webp/u/martibis/avatar/medium',
+                                      amount: 5,
+                                      currency: 'HIVE',
+                                      reccurenceString: 'Monthly',
+                                      recurrence: HOURSPERMONTH,
+                                      remainingExecutions:
+                                          23)) /* ManualTransfer(
                                         username: 'martibis',
-                                        amount: '10',
+                                        amount: '5',
                                         memo:
                                             'Thank you for wanting to donate so we can keep improving Hiverrr!',
-                                      )));
+                                      ) */
+                              ));
                         },
                         mainContent: Text(
-                          '🙏',
+                          '☕',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
