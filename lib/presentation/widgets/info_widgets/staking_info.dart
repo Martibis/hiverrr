@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class StakingInfo extends StatelessWidget {
   final UserBalance userBalance;
@@ -19,6 +20,38 @@ class StakingInfo extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Divider(
+                height: 50,
+              ),
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(
+                  text: 'HIVE interest (APR):   ',
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+                TextSpan(
+                  text: userBalance.hivestakedinterest.toStringAsFixed(2) + '%',
+                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Theme.of(context).highlightColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ])),
+              Container(
+                height: 15,
+              ),
+              RichText(
+                  text: TextSpan(children: [
+                TextSpan(
+                  text: 'Curation (APR):   ',
+                  style: Theme.of(context).textTheme.bodyText2,
+                ),
+                TextSpan(
+                  text: userBalance.curationinterest.toStringAsFixed(2) + '%',
+                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
+                      color: Theme.of(context).highlightColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ])),
               Divider(
                 height: 50,
               ),
@@ -53,38 +86,37 @@ class StakingInfo extends StatelessWidget {
                       .copyWith(fontWeight: FontWeight.bold),
                 ),
               ])),
-              Divider(
-                height: 50,
-              ),
-              RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                  text: 'HIVE interest (APR):   ',
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-                TextSpan(
-                  text: userBalance.hivestakedinterest.toStringAsFixed(2) + '%',
-                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).highlightColor,
-                      fontWeight: FontWeight.bold),
-                ),
-              ])),
-              Container(
-                height: 15,
-              ),
-              RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                  text: 'Curation (APR):   ',
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-                TextSpan(
-                  text: userBalance.curationinterest.toStringAsFixed(2) + '%',
-                  style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                      color: Theme.of(context).highlightColor,
-                      fontWeight: FontWeight.bold),
-                ),
-              ])),
+              userBalance.powerDownRate > 0
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Divider(
+                          height: 50,
+                        ),
+                        RichText(
+                            text: TextSpan(children: [
+                          TextSpan(
+                            text: 'Powering down ',
+                            style: Theme.of(context).textTheme.bodyText2,
+                          ),
+                          TextSpan(
+                            text: userBalance.powerDownRate.toStringAsFixed(3) +
+                                ' Hive',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText2!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(
+                            text: ' ' +
+                                timeago.format(userBalance.nextPowerDown,
+                                    allowFromNow: true),
+                            style: Theme.of(context).textTheme.bodyText2,
+                          ),
+                        ])),
+                      ],
+                    )
+                  : Container()
             ],
           )),
       mainContent: Container(

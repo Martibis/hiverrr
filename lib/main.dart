@@ -9,7 +9,6 @@ import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
 import 'package:hiverrr/data/models/subscription_model.dart';
 import 'package:hiverrr/presentation/receive/receive.dart';
-import 'package:hiverrr/presentation/send/manual_transfer.dart';
 import 'package:hiverrr/presentation/send/send.dart';
 import 'package:hiverrr/presentation/subscriptions/subscription.dart';
 import 'package:hiverrr/presentation/subscriptions/subscriptions.dart';
@@ -27,7 +26,6 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import 'blocs/authbloc/auth_bloc.dart';
 import 'blocs/theming_bloc/theming_bloc.dart';
-import 'data/models/user_balance_model.dart';
 
 void main() {
   runApp(MyAppStart());

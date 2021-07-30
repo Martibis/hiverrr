@@ -11,22 +11,22 @@ import 'package:http/http.dart' as http;
 class HiveCalls {
   Future<UserBalance> getUserBalance({required String username}) async {
     final results = await Future.wait(([
-      http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body:
               '{"jsonrpc":"2.0", "method":"database_api.find_accounts", "params": {"accounts":["' +
                   username +
                   '"]}, "id":1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body:
               '{"jsonrpc":"2.0", "method":"database_api.get_dynamic_global_properties", "id":1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
               username +
               '", "start":-1, "limit":250, "operation_filter_low": 4503599627370496}, "id": 1}'),
-      /*  http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+      /*  http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body:
               '{"jsonrpc":"2.0", "method":"database_api.get_current_price_feed", "id":1}'), */
-      http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body:
               '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}')
     ]));
@@ -77,6 +77,12 @@ class HiveCalls {
             ['received_vesting_shares']['amount']))! /
         (pow(10, receivedVestsPrecision!));
 
+    int? withdrawingVestsRatePrecision =
+        data['result']['accounts'][0]['vesting_withdraw_rate']['precision'];
+    num? withdrawingVestsRate = (num.tryParse(data['result']['accounts'][0]
+            ['vesting_withdraw_rate']['amount']))! /
+        (pow(10, withdrawingVestsRatePrecision!));
+
     num totalVestingFundHive =
         num.tryParse(data2['result']['total_vesting_fund_hive']['amount']!)! /
             (pow(10, data2['result']['total_vesting_fund_hive']['precision']!));
@@ -93,6 +99,12 @@ class HiveCalls {
 
     num receivedHivePower =
         (totalVestingFundHive * receivedVestsBalance) / totalVestingShares;
+
+    num powerDownRate =
+        (totalVestingFundHive * withdrawingVestsRate) / totalVestingShares;
+
+    String nextPowerdown =
+        data['result']['accounts'][0]['next_vesting_withdrawal'];
 
     num hbdSavingsInterestRate = data2['result']['hbd_interest_rate'] / 100;
 
@@ -112,8 +124,6 @@ class HiveCalls {
 
     num hivePowerInterestRate =
         currentInflationRate * supplyForInterest * vestingRewardPercent;
-
-    //TODO calcualte curationInterest:
 
     num headBlockNumber = data2['result']['head_block_number'];
     num limit = 201600; //this is 7 days in 3 second blocks
@@ -147,8 +157,8 @@ class HiveCalls {
         ((curationRewards / ownedVestsBalance) * times) * 100;
 
     num hivePrice = (num.tryParse(
-            data5['result']['current_max_history']['base']['amount'])! /
-        pow(10, data5['result']['current_max_history']['base']['precision']));
+            data5['result']['price_history'].last['base']['amount'])! /
+        pow(10, data5['result']['price_history'].last['base']['precision']));
 
     num estimatedUsdValue = hbdBalance +
         (hiveBalance * hivePrice) +
@@ -169,7 +179,9 @@ class HiveCalls {
         hivestakedinterest: hivePowerInterestRate,
         curationinterest: curationInterest,
         estimatedUsdValue: estimatedUsdValue,
-        hivePrice: hivePrice);
+        hivePrice: hivePrice,
+        powerDownRate: powerDownRate,
+        nextPowerDown: DateTime.parse(nextPowerdown));
   }
 
   //make sure to add redirecturi to params
@@ -187,7 +199,7 @@ class HiveCalls {
       {required String username,
       required int pageKey,
       required int limit}) async {
-    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[2]),
         body:
             '{"jsonrpc":"2.0", "method":"database_api.find_recurrent_transfers", "params":{"from":"' +
                 username +
@@ -254,7 +266,7 @@ class HiveCalls {
       required String memo,
       required String amount,
       required String nai}) async {
-    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[1]),
+    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[2]),
         body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
             username +
             '", "start":-1, "limit":1, "operation_filter_low": 100}, "id": 1}');
