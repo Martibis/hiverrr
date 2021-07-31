@@ -10,29 +10,41 @@ import 'package:http/http.dart' as http;
 
 class HiveCalls {
   Future<UserBalance> getUserBalance({required String username}) async {
-    final results = await Future.wait(([
-      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body:
-              '{"jsonrpc":"2.0", "method":"database_api.find_accounts", "params": {"accounts":["' +
+    List? results;
+
+    //Auto change node
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        results = await Future.wait(([
+          http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+              body:
+                  '{"jsonrpc":"2.0", "method":"database_api.find_accounts", "params": {"accounts":["' +
+                      username +
+                      '"]}, "id":1}'),
+          http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+              body:
+                  '{"jsonrpc":"2.0", "method":"database_api.get_dynamic_global_properties", "id":1}'),
+          http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+              body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
                   username +
-                  '"]}, "id":1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body:
-              '{"jsonrpc":"2.0", "method":"database_api.get_dynamic_global_properties", "id":1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
-              username +
-              '", "start":-1, "limit":250, "operation_filter_low": 4503599627370496}, "id": 1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body:
-              '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}'),
-      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body:
-              '{"jsonrpc":"2.0", "method":"database_api.find_savings_withdrawals", "params": {"account": "' +
-                  username +
-                  '"}, "id":1}'),
-    ]));
-    Map data = await jsonDecode(results[0].body);
+                  '", "start":-1, "limit":250, "operation_filter_low": 4503599627370496}, "id": 1}'),
+          http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+              body:
+                  '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}'),
+          http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+              body:
+                  '{"jsonrpc":"2.0", "method":"database_api.find_savings_withdrawals", "params": {"account": "' +
+                      username +
+                      '"}, "id":1}'),
+        ]));
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+
+    Map data = await jsonDecode(results![0].body);
     Map data2 = await jsonDecode(results[1].body);
     Map data3 = await jsonDecode(results[2].body);
     Map data4 = await jsonDecode(results[3].body);
@@ -227,16 +239,26 @@ class HiveCalls {
       {required String username,
       required int pageKey,
       required int limit}) async {
-    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-        body:
-            '{"jsonrpc":"2.0", "method":"database_api.find_recurrent_transfers", "params":{"from":"' +
-                username +
-                '", "start": ' +
-                pageKey.toString() +
-                ', "limit":' +
-                limit.toString() +
-                '}, "id": 1}');
-    Map data = await jsonDecode(r.body);
+    http.Response? r;
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        r = await http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+            body:
+                '{"jsonrpc":"2.0", "method":"database_api.find_recurrent_transfers", "params":{"from":"' +
+                    username +
+                    '", "start": ' +
+                    pageKey.toString() +
+                    ', "limit":' +
+                    limit.toString() +
+                    '}, "id": 1}');
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+
+    Map data = await jsonDecode(r!.body);
 
     List<SubscriptionModel> subscriptions = [];
 
@@ -294,11 +316,20 @@ class HiveCalls {
       required String memo,
       required String amount,
       required String nai}) async {
-    http.Response r = await http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-        body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
-            username +
-            '", "start":-1, "limit":1, "operation_filter_low": 100}, "id": 1}');
-    Map data = await jsonDecode(r.body);
+    http.Response? r;
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        r = await http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+            body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
+                username +
+                '", "start":-1, "limit":1, "operation_filter_low": 100}, "id": 1}');
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+    Map data = await jsonDecode(r!.body);
 
     bool isReceived = false;
     for (int i = 0; i < data['result']['history'].length; i++) {
