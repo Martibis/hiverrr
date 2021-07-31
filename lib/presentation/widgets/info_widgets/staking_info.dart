@@ -322,7 +322,13 @@ class StakingInfo extends StatelessWidget {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                  print('TODO');
+                  //TODO
+                  BotToast.showText(
+                    crossPage: false,
+                    text: "This feature is coming soon! 🤩",
+                    textStyle: TextStyle(color: Colors.white),
+                    borderRadius: BorderRadius.circular(4),
+                  );
                 },
                 child: Container(
                   padding: EdgeInsets.only(top: 15),
