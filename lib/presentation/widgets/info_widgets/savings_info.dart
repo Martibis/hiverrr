@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
+import 'package:hiverrr/presentation/savings/send_to_savings.dart';
+import 'package:hiverrr/presentation/savings/withdraw_from_savings.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
 
 class SavingsInfo extends StatelessWidget {
@@ -60,6 +62,121 @@ class SavingsInfo extends StatelessWidget {
                         : Theme.of(context).textTheme.bodyText2!.color),
               ),
             ])),
+            Container(
+              height: 15,
+            ),
+            Divider(
+              height: userBalance.amountSavingWithdrawals > 0 ? 50 : 25,
+            ),
+            userBalance.amountSavingWithdrawals > 0
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      userBalance.totalOfHbdSavingWithdrawals > 0
+                          ? RichText(
+                              text: TextSpan(children: [
+                              TextSpan(
+                                text: 'Withdrawing HBD: ',
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              TextSpan(
+                                text: userBalance.totalOfHbdSavingWithdrawals
+                                    .toStringAsFixed(3),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: userBalance
+                                                    .hivesavinginterestrate >
+                                                0
+                                            ? Theme.of(context).highlightColor
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .color),
+                              ),
+                            ]))
+                          : Container(),
+                      userBalance.totalOfHiveSavingWithdrawals > 0
+                          ? Container(
+                              height: 15,
+                            )
+                          : Container(),
+                      userBalance.totalOfHiveSavingWithdrawals > 0
+                          ? RichText(
+                              text: TextSpan(children: [
+                              TextSpan(
+                                text: 'Withdrawing HIVE: ',
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              TextSpan(
+                                text: userBalance.totalOfHiveSavingWithdrawals
+                                    .toStringAsFixed(3),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyText2!
+                                    .copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: userBalance
+                                                    .hivesavinginterestrate >
+                                                0
+                                            ? Theme.of(context).highlightColor
+                                            : Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .color),
+                              ),
+                            ]))
+                          : Container(),
+                      Container(
+                        height: 15,
+                      ),
+                      Divider(
+                        height: 25,
+                      )
+                    ],
+                  )
+                : Container(),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                Navigator.of(context, rootNavigator: true)
+                    .push(MaterialPageRoute(
+                        builder: (_) => SendToSavings(
+                              maxHbd: userBalance.hbdbalance.toString(),
+                              maxHive: userBalance.hivebalance.toString(),
+                            )));
+              },
+              child: Container(
+                padding: EdgeInsets.only(top: 15),
+                child: Text(
+                  'Send to savings',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                Navigator.of(context, rootNavigator: true)
+                    .push(MaterialPageRoute(
+                        builder: (_) => WithdrawFromSavings(
+                              maxHbd: userBalance.hbdsavingsbalance.toString(),
+                              maxHive:
+                                  userBalance.hivesavingsbalance.toString(),
+                            )));
+              },
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: 15,
+                ),
+                child: Text(
+                  'Withdraw from savings',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
           ])),
       mainContent: Container(
         width: double.infinity,

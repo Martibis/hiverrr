@@ -14,6 +14,9 @@ class UserBalance {
   num hivePrice;
   num powerDownRate;
   DateTime nextPowerDown;
+  num amountSavingWithdrawals;
+  num totalOfHiveSavingWithdrawals;
+  num totalOfHbdSavingWithdrawals;
 
   UserBalance(
       {required this.hbdbalance,
@@ -30,5 +33,8 @@ class UserBalance {
       required this.estimatedUsdValue,
       required this.hivePrice,
       required this.powerDownRate,
-      required this.nextPowerDown});
+      required this.nextPowerDown,
+      required this.amountSavingWithdrawals,
+      required this.totalOfHbdSavingWithdrawals,
+      required this.totalOfHiveSavingWithdrawals});
 }

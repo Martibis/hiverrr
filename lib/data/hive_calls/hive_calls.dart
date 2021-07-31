@@ -23,18 +23,20 @@ class HiveCalls {
           body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
               username +
               '", "start":-1, "limit":250, "operation_filter_low": 4503599627370496}, "id": 1}'),
-      /*  http.post(Uri(scheme: 'https', host: HIVENODES[2]),
-          body:
-              '{"jsonrpc":"2.0", "method":"database_api.get_current_price_feed", "id":1}'), */
       http.post(Uri(scheme: 'https', host: HIVENODES[2]),
           body:
-              '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}')
+              '{"jsonrpc":"2.0", "method":"database_api.get_feed_history", "id":1}'),
+      http.post(Uri(scheme: 'https', host: HIVENODES[2]),
+          body:
+              '{"jsonrpc":"2.0", "method":"database_api.find_savings_withdrawals", "params": {"account": "' +
+                  username +
+                  '"}, "id":1}'),
     ]));
     Map data = await jsonDecode(results[0].body);
     Map data2 = await jsonDecode(results[1].body);
     Map data3 = await jsonDecode(results[2].body);
-    /* Map data4 = await jsonDecode(results[3].body); */
-    Map data5 = await jsonDecode(results[3].body);
+    Map data4 = await jsonDecode(results[3].body);
+    Map data5 = await jsonDecode(results[4].body);
 
     int? hbdPrecision =
         data['result']['accounts'][0]['hbd_balance']['precision'];
@@ -157,14 +159,37 @@ class HiveCalls {
         ((curationRewards / ownedVestsBalance) * times) * 100;
 
     num hivePrice = (num.tryParse(
-            data5['result']['price_history'].last['base']['amount'])! /
-        pow(10, data5['result']['price_history'].last['base']['precision']));
+            data4['result']['price_history'].last['base']['amount'])! /
+        pow(10, data4['result']['price_history'].last['base']['precision']));
+
+    num amountSavingWithdrawals = data5['result']['withdrawals'].length;
+
+    num totalOfHiveSavingWithdrawals = 0;
+
+    num totalOfHbdSavingWithdrawals = 0;
+
+    for (int i = 0; i < amountSavingWithdrawals; i++) {
+      Map withdrawal = data5['result']['withdrawals'][i];
+      if (withdrawal['amount']['nai'] == HIVENAI) {
+        totalOfHiveSavingWithdrawals +=
+            (num.tryParse(withdrawal['amount']['amount'])! /
+                pow(10, withdrawal['amount']['precision']));
+      } else {
+        if (withdrawal['amount']['nai'] == HBDNAI) {
+          totalOfHbdSavingWithdrawals +=
+              (num.tryParse(withdrawal['amount']['amount'])! /
+                  pow(10, withdrawal['amount']['precision']));
+        }
+      }
+    }
 
     num estimatedUsdValue = hbdBalance +
         (hiveBalance * hivePrice) +
         savingHbdBalance +
         (hivePower * hivePrice) +
-        (savingHiveBalance * hivePrice);
+        (savingHiveBalance * hivePrice) +
+        totalOfHbdSavingWithdrawals +
+        (totalOfHiveSavingWithdrawals * hivePrice);
 
     return UserBalance(
         hbdbalance: hbdBalance,
@@ -181,7 +206,10 @@ class HiveCalls {
         estimatedUsdValue: estimatedUsdValue,
         hivePrice: hivePrice,
         powerDownRate: powerDownRate,
-        nextPowerDown: DateTime.parse(nextPowerdown));
+        nextPowerDown: DateTime.parse(nextPowerdown),
+        amountSavingWithdrawals: amountSavingWithdrawals,
+        totalOfHbdSavingWithdrawals: totalOfHbdSavingWithdrawals,
+        totalOfHiveSavingWithdrawals: totalOfHiveSavingWithdrawals);
   }
 
   //make sure to add redirecturi to params
