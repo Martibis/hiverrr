@@ -288,13 +288,12 @@ class _WithdrawFromSavingsState extends State<WithdrawFromSavings> {
                                   ],
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    hintText: '10.00',
-                                  ),
+                                      hintText: '10.00', helperText: ''),
                                   //textAlign: TextAlign.center,
                                 ),
                               ),
                               NeumorphismContainer(
-                                margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                                margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
                                 color: Theme.of(context).backgroundColor,
                                 onTap: () {
                                   isHive

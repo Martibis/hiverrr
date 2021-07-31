@@ -12,20 +12,17 @@ import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.d
 import 'package:hiverrr/presentation/widgets/screen_header/screen_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class SendToSavings extends StatefulWidget {
+class PowerUp extends StatefulWidget {
   final String? amount;
   final String maxHive;
-  final String maxHbd;
-  SendToSavings(
-      {Key? key, this.amount, required this.maxHive, required this.maxHbd})
-      : super(key: key);
+
+  PowerUp({Key? key, this.amount, required this.maxHive}) : super(key: key);
 
   @override
-  _SendToSavingsState createState() => _SendToSavingsState();
+  _PowerUpState createState() => _PowerUpState();
 }
 
-class _SendToSavingsState extends State<SendToSavings> {
-  bool isHive = true;
+class _PowerUpState extends State<PowerUp> {
   GlobalKey<FormState> _sendFormKey = GlobalKey<FormState>();
   TextEditingController _amountController = TextEditingController();
   WebViewController? webViewController;
@@ -84,7 +81,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                                   if (uri.host.contains('hiverrr')) {
                                     BotToast.showText(
                                       crossPage: true,
-                                      text: "Transfer was succesful! 🤩",
+                                      text: "Power up was succesful! 🤩",
                                       textStyle: TextStyle(color: Colors.white),
                                       borderRadius: BorderRadius.circular(4),
                                     );
@@ -183,84 +180,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                       child: ListView(
                         physics: BouncingScrollPhysics(),
                         children: [
-                          ScreenHeader(
-                              title: 'Send to savings', hasBackButton: true),
-                          Row(
-                            children: [
-                              Container(
-                                width: 25,
-                              ),
-                              Expanded(
-                                child: NeumorphismContainer(
-                                  margin: EdgeInsets.all(0),
-                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                  color: isHive
-                                      ? Theme.of(context).accentColor
-                                      : Theme.of(context).backgroundColor,
-                                  onTap: () {
-                                    setState(() {
-                                      if (!isHive) {
-                                        isHive = !isHive;
-                                      }
-                                    });
-                                  },
-                                  mainContent: Text(
-                                    'hive',
-                                    style: TextStyle(
-                                        color: isHive
-                                            ? Colors.white
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .color,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  expandableContent: Container(),
-                                  expandable: false,
-                                ),
-                              ),
-                              Container(
-                                width: 25,
-                              ),
-                              Expanded(
-                                child: NeumorphismContainer(
-                                  margin: EdgeInsets.all(0),
-                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                  color: !isHive
-                                      ? Theme.of(context).accentColor
-                                      : Theme.of(context).backgroundColor,
-                                  onTap: () {
-                                    setState(() {
-                                      if (isHive) {
-                                        isHive = !isHive;
-                                      }
-                                    });
-                                  },
-                                  mainContent: Text(
-                                    'hbd',
-                                    style: TextStyle(
-                                        color: !isHive
-                                            ? Colors.white
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .color,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  expandableContent: Container(),
-                                  expandable: false,
-                                ),
-                              ),
-                              Container(
-                                width: 25,
-                              ),
-                            ],
-                          ),
-                          Container(
-                            height: 25,
-                          ),
+                          ScreenHeader(title: 'Power up', hasBackButton: true),
                           Container(
                             padding: myEdgeInsets.leftRight,
                             child: Row(children: [
@@ -287,7 +207,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                                   ],
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    helperText: '',
+                                    helperText: 'HIVE to power up',
                                     hintText: '10.00',
                                   ),
                                   //textAlign: TextAlign.center,
@@ -297,9 +217,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                                 margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
                                 color: Theme.of(context).backgroundColor,
                                 onTap: () {
-                                  isHive
-                                      ? _amountController.text = widget.maxHive
-                                      : _amountController.text = widget.maxHbd;
+                                  _amountController.text = widget.maxHive;
                                 },
                                 mainContent: Text('max'),
                                 expandableContent: Container(),
@@ -324,12 +242,11 @@ class _SendToSavingsState extends State<SendToSavings> {
                               Map<String, dynamic> op = {
                                 "from": '__signer',
                                 "to": '__signer',
-                                "amount": _amountController.text +
-                                    (isHive ? ' HIVE' : ' HBD'),
+                                "amount": _amountController.text + ' HIVE',
                                 "redirect_uri": 'https://hiverrr.com'
                               };
                               Uri uri = hc.getHivesignerSignUrl(
-                                  type: 'transfer_to_savings', params: op);
+                                  type: 'transfer_to_vesting', params: op);
 
                               if (FocusScope.of(context).isFirstFocus) {
                                 FocusScope.of(context)

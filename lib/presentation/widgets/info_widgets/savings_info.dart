@@ -62,21 +62,20 @@ class SavingsInfo extends StatelessWidget {
                         : Theme.of(context).textTheme.bodyText2!.color),
               ),
             ])),
-            Container(
-              height: 15,
-            ),
-            Divider(
-              height: userBalance.amountSavingWithdrawals > 0 ? 50 : 25,
-            ),
             userBalance.amountSavingWithdrawals > 0
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       userBalance.totalOfHbdSavingWithdrawals > 0
+                          ? Container(
+                              height: 15,
+                            )
+                          : Container(),
+                      userBalance.totalOfHbdSavingWithdrawals > 0
                           ? RichText(
                               text: TextSpan(children: [
                               TextSpan(
-                                text: 'Withdrawing HBD: ',
+                                text: 'Withdrawing HBD:   ',
                                 style: Theme.of(context).textTheme.bodyText2,
                               ),
                               TextSpan(
@@ -129,15 +128,15 @@ class SavingsInfo extends StatelessWidget {
                               ),
                             ]))
                           : Container(),
-                      Container(
-                        height: 15,
-                      ),
-                      Divider(
-                        height: 25,
-                      )
                     ],
                   )
                 : Container(),
+            Container(
+              height: 15,
+            ),
+            Divider(
+              height: 25,
+            ),
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {

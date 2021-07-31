@@ -12,20 +12,23 @@ import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.d
 import 'package:hiverrr/presentation/widgets/screen_header/screen_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class SendToSavings extends StatefulWidget {
+class PowerDown extends StatefulWidget {
   final String? amount;
   final String maxHive;
-  final String maxHbd;
-  SendToSavings(
-      {Key? key, this.amount, required this.maxHive, required this.maxHbd})
+  final num hpToVestsMultiplier;
+
+  PowerDown(
+      {Key? key,
+      this.amount,
+      required this.maxHive,
+      required this.hpToVestsMultiplier})
       : super(key: key);
 
   @override
-  _SendToSavingsState createState() => _SendToSavingsState();
+  _PowerDownState createState() => _PowerDownState();
 }
 
-class _SendToSavingsState extends State<SendToSavings> {
-  bool isHive = true;
+class _PowerDownState extends State<PowerDown> {
   GlobalKey<FormState> _sendFormKey = GlobalKey<FormState>();
   TextEditingController _amountController = TextEditingController();
   WebViewController? webViewController;
@@ -84,7 +87,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                                   if (uri.host.contains('hiverrr')) {
                                     BotToast.showText(
                                       crossPage: true,
-                                      text: "Transfer was succesful! 🤩",
+                                      text: "Power down was succesful! 🤩",
                                       textStyle: TextStyle(color: Colors.white),
                                       borderRadius: BorderRadius.circular(4),
                                     );
@@ -184,83 +187,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                         physics: BouncingScrollPhysics(),
                         children: [
                           ScreenHeader(
-                              title: 'Send to savings', hasBackButton: true),
-                          Row(
-                            children: [
-                              Container(
-                                width: 25,
-                              ),
-                              Expanded(
-                                child: NeumorphismContainer(
-                                  margin: EdgeInsets.all(0),
-                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                  color: isHive
-                                      ? Theme.of(context).accentColor
-                                      : Theme.of(context).backgroundColor,
-                                  onTap: () {
-                                    setState(() {
-                                      if (!isHive) {
-                                        isHive = !isHive;
-                                      }
-                                    });
-                                  },
-                                  mainContent: Text(
-                                    'hive',
-                                    style: TextStyle(
-                                        color: isHive
-                                            ? Colors.white
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .color,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  expandableContent: Container(),
-                                  expandable: false,
-                                ),
-                              ),
-                              Container(
-                                width: 25,
-                              ),
-                              Expanded(
-                                child: NeumorphismContainer(
-                                  margin: EdgeInsets.all(0),
-                                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                  color: !isHive
-                                      ? Theme.of(context).accentColor
-                                      : Theme.of(context).backgroundColor,
-                                  onTap: () {
-                                    setState(() {
-                                      if (isHive) {
-                                        isHive = !isHive;
-                                      }
-                                    });
-                                  },
-                                  mainContent: Text(
-                                    'hbd',
-                                    style: TextStyle(
-                                        color: !isHive
-                                            ? Colors.white
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyText1!
-                                                .color,
-                                        fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  expandableContent: Container(),
-                                  expandable: false,
-                                ),
-                              ),
-                              Container(
-                                width: 25,
-                              ),
-                            ],
-                          ),
-                          Container(
-                            height: 25,
-                          ),
+                              title: 'Power down', hasBackButton: true),
                           Container(
                             padding: myEdgeInsets.leftRight,
                             child: Row(children: [
@@ -287,9 +214,8 @@ class _SendToSavingsState extends State<SendToSavings> {
                                   ],
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
-                                    helperText: '',
-                                    hintText: '10.00',
-                                  ),
+                                      hintText: '10.00',
+                                      helperText: 'HIVE to power down'),
                                   //textAlign: TextAlign.center,
                                 ),
                               ),
@@ -297,9 +223,7 @@ class _SendToSavingsState extends State<SendToSavings> {
                                 margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
                                 color: Theme.of(context).backgroundColor,
                                 onTap: () {
-                                  isHive
-                                      ? _amountController.text = widget.maxHive
-                                      : _amountController.text = widget.maxHbd;
+                                  _amountController.text = widget.maxHive;
                                 },
                                 mainContent: Text('max'),
                                 expandableContent: Container(),
@@ -320,16 +244,23 @@ class _SendToSavingsState extends State<SendToSavings> {
                           color: Theme.of(context).accentColor,
                           tapable: true,
                           onTap: () {
+                            print((num.parse(_amountController.text) *
+                                        widget.hpToVestsMultiplier)
+                                    .toString() +
+                                ' VESTS');
                             if (_validInputs()) {
                               Map<String, dynamic> op = {
-                                "from": '__signer',
-                                "to": '__signer',
-                                "amount": _amountController.text +
-                                    (isHive ? ' HIVE' : ' HBD'),
+                                "account": '__signer',
+                                "vesting_shares":
+                                    (num.parse(_amountController.text) *
+                                                widget.hpToVestsMultiplier)
+                                            .floor()
+                                            .toString() +
+                                        ' VESTS',
                                 "redirect_uri": 'https://hiverrr.com'
                               };
                               Uri uri = hc.getHivesignerSignUrl(
-                                  type: 'transfer_to_savings', params: op);
+                                  type: 'withdraw_vesting', params: op);
 
                               if (FocusScope.of(context).isFirstFocus) {
                                 FocusScope.of(context)
@@ -353,6 +284,14 @@ class _SendToSavingsState extends State<SendToSavings> {
                         ),
                       ),
                     ]),
+                    Container(
+                      height: 10,
+                    ),
+                    Container(
+                      padding: myEdgeInsets.leftRight,
+                      child: Text(
+                          'Please note it will take 13 weeks to power down, you will receive 1/13th of the power down amount every week.'),
+                    ),
                     Container(
                       height: 25,
                     ),

@@ -17,6 +17,7 @@ class UserBalance {
   num amountSavingWithdrawals;
   num totalOfHiveSavingWithdrawals;
   num totalOfHbdSavingWithdrawals;
+  num hpToVestsMultiplier;
 
   UserBalance(
       {required this.hbdbalance,
@@ -36,5 +37,6 @@ class UserBalance {
       required this.nextPowerDown,
       required this.amountSavingWithdrawals,
       required this.totalOfHbdSavingWithdrawals,
-      required this.totalOfHiveSavingWithdrawals});
+      required this.totalOfHiveSavingWithdrawals,
+      required this.hpToVestsMultiplier});
 }

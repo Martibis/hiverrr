@@ -117,6 +117,7 @@ class ThemeDatas {
       cursorColor: Colors.black, //thereby
     ),
     inputDecorationTheme: InputDecorationTheme(
+      helperStyle: TextStyle(color: Colors.white),
       contentPadding: EdgeInsets.fromLTRB(20, 20, 20, 20),
       fillColor: Colors.white,
       filled: true,

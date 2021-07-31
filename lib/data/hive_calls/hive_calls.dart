@@ -114,6 +114,8 @@ class HiveCalls {
     num receivedHivePower =
         (totalVestingFundHive * receivedVestsBalance) / totalVestingShares;
 
+    num hpToVestsMultiplier = totalVestingShares / totalVestingFundHive;
+
     num powerDownRate =
         (totalVestingFundHive * withdrawingVestsRate) / totalVestingShares;
 
@@ -221,7 +223,8 @@ class HiveCalls {
         nextPowerDown: DateTime.parse(nextPowerdown),
         amountSavingWithdrawals: amountSavingWithdrawals,
         totalOfHbdSavingWithdrawals: totalOfHbdSavingWithdrawals,
-        totalOfHiveSavingWithdrawals: totalOfHiveSavingWithdrawals);
+        totalOfHiveSavingWithdrawals: totalOfHiveSavingWithdrawals,
+        hpToVestsMultiplier: hpToVestsMultiplier);
   }
 
   //make sure to add redirecturi to params
