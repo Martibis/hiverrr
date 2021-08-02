@@ -4,6 +4,7 @@ import 'dart:developer' as d;
 import 'dart:math';
 
 import 'package:hiverrr/constants/constants.dart';
+import 'package:hiverrr/data/models/delegation_model.dart';
 import 'package:hiverrr/data/models/subscription_model.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
 import 'package:http/http.dart' as http;
@@ -220,7 +221,7 @@ class HiveCalls {
         estimatedUsdValue: estimatedUsdValue,
         hivePrice: hivePrice,
         powerDownRate: powerDownRate,
-        nextPowerDown: DateTime.parse(nextPowerdown),
+        nextPowerDown: DateTime.parse(nextPowerdown).toUtc(),
         amountSavingWithdrawals: amountSavingWithdrawals,
         totalOfHbdSavingWithdrawals: totalOfHbdSavingWithdrawals,
         totalOfHiveSavingWithdrawals: totalOfHiveSavingWithdrawals,
@@ -311,6 +312,99 @@ class HiveCalls {
     }
 
     return subscriptions;
+  }
+
+  Future<List<DelegationModel>> getDelegations(
+      {required String username,
+      required int pageKey,
+      required int limit,
+      required num vestsToHive}) async {
+    http.Response? r;
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        r = await http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+            body:
+                '{"jsonrpc":"2.0", "method":"database_api.find_vesting_delegations", "params":{"account":"' +
+                    username +
+                    '", "start": ' +
+                    pageKey.toString() +
+                    ', "limit":' +
+                    limit.toString() +
+                    '}, "id": 1}');
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+
+    Map data = await jsonDecode(r!.body);
+
+    //TODO: loop over and create delegation models
+    print(data);
+    List<DelegationModel> delegations = [];
+    for (int i = 0; i < data['result']['delegations'].length; i++) {
+      Map delegationMap = data['result']['delegations'][i];
+
+      print(vestsToHive);
+      num hivePowerAmount =
+          (num.tryParse(delegationMap['vesting_shares']['amount'])! /
+                  (pow(10, delegationMap['vesting_shares']['precision']))) /
+              vestsToHive;
+      delegations.add(DelegationModel(
+          amount: hivePowerAmount,
+          currency: 'HIVE',
+          username: delegationMap['delegatee'],
+          profilepic: 'https://images.ecency.com/webp/u/' +
+              delegationMap['delegatee'] +
+              '/avatar/medium'));
+    }
+    return delegations;
+  }
+
+  Future<List<DelegationModel>> getExpiringDelegations(
+      {required String username,
+      required int pageKey,
+      required int limit,
+      required num vestsToHive}) async {
+    http.Response? r;
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        r = await http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+            body:
+                '{"jsonrpc":"2.0", "method":"database_api.find_vesting_delegation_expirations", "params":{"account":"' +
+                    username +
+                    '", "start": ' +
+                    pageKey.toString() +
+                    ', "limit":' +
+                    limit.toString() +
+                    '}, "id": 1}');
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+
+    Map data = await jsonDecode(r!.body);
+
+    print(data);
+    List<DelegationModel> delegations = [];
+    for (int i = 0; i < data['result']['delegations'].length; i++) {
+      Map delegationMap = data['result']['delegations'][i];
+
+      print(vestsToHive);
+      num hivePowerAmount =
+          (num.tryParse(delegationMap['vesting_shares']['amount'])! /
+                  (pow(10, delegationMap['vesting_shares']['precision']))) /
+              vestsToHive;
+      delegations.add(DelegationModel(
+          amount: hivePowerAmount,
+          currency: 'HIVE',
+          isExpiring: true,
+          expireDate: DateTime.parse(delegationMap['expiration']).toUtc()));
+    }
+    return delegations;
   }
 
   //TODO: check why this is so slow

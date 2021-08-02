@@ -5,35 +5,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/authbloc/auth_bloc.dart';
+import 'package:hiverrr/blocs/delegations_bloc/delegations_bloc.dart';
+import 'package:hiverrr/blocs/subscriptions_bloc/subscriptions_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
+import 'package:hiverrr/data/models/delegation_model.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
 import 'package:hiverrr/presentation/widgets/screen_header/screen_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class PowerDown extends StatefulWidget {
-  final String? amount;
-  final String maxHive;
-  final num hpToVestsMultiplier;
-
-  PowerDown(
+class Delegation extends StatefulWidget {
+  final DelegationModel? delegation;
+  final bool changingDelegation;
+  final num vestsToHive;
+  Delegation(
       {Key? key,
-      this.amount,
-      required this.maxHive,
-      required this.hpToVestsMultiplier})
+      this.delegation,
+      this.changingDelegation = false,
+      required this.vestsToHive})
       : super(key: key);
 
   @override
-  _PowerDownState createState() => _PowerDownState();
+  _DelegationState createState() => _DelegationState();
 }
 
-class _PowerDownState extends State<PowerDown> {
-  GlobalKey<FormState> _sendFormKey = GlobalKey<FormState>();
+class _DelegationState extends State<Delegation> {
+  GlobalKey<FormState> _subscriptionFormKey = GlobalKey<FormState>();
   TextEditingController _amountController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
   WebViewController? webViewController;
 
-  confirmTransaction(String url) {
+  confirmTransaction({required String url, bool isCancel = false}) {
     if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
     BotToast.showAnimationWidget(
         clickClose: false,
@@ -82,17 +85,26 @@ class _PowerDownState extends State<PowerDown> {
                                 initialUrl: url.toString(),
                                 onPageStarted: (url) {
                                   Uri uri = Uri.parse(url);
-
                                   //this means succesful transfer
                                   if (uri.host.contains('hiverrr')) {
                                     BotToast.showText(
                                       crossPage: true,
-                                      text: "Power down was succesful! 🤩",
+                                      text: widget.changingDelegation
+                                          ? (isCancel
+                                              ? "Delegating canceled"
+                                              : "Succesfully updated! 🤩")
+                                          : "Succesfully delegated! 🤩",
                                       textStyle: TextStyle(color: Colors.white),
                                       borderRadius: BorderRadius.circular(4),
                                     );
                                     BlocProvider.of<UserbalanceBloc>(context)
                                         .add(GetUserBalance(
+                                            username: state.user.username));
+                                    BlocProvider.of<DelegationsBloc>(context)
+                                        .add(FetchDelegations(
+                                            vestsToHive: widget.vestsToHive,
+                                            pageKey: 0,
+                                            isRefresh: true,
                                             username: state.user.username));
                                     cancel();
                                     Navigator.of(context).pop();
@@ -124,7 +136,7 @@ class _PowerDownState extends State<PowerDown> {
   }
 
   bool _validInputs() {
-    if (_sendFormKey.currentState!.validate()) {
+    if (_subscriptionFormKey.currentState!.validate()) {
       return true;
     } else {
       return false;
@@ -167,7 +179,10 @@ class _PowerDownState extends State<PowerDown> {
 
   @override
   void initState() {
-    _amountController.text = (widget.amount == null ? '' : widget.amount)!;
+    if (widget.delegation != null) {
+      _usernameController.text = widget.delegation!.username!;
+      _amountController.text = widget.delegation!.amount.toStringAsFixed(3);
+    }
     super.initState();
   }
 
@@ -179,7 +194,7 @@ class _PowerDownState extends State<PowerDown> {
           builder: (context, state) {
             if (state is LoggedIn) {
               return Form(
-                key: _sendFormKey,
+                key: _subscriptionFormKey,
                 child: Column(
                   children: [
                     Expanded(
@@ -187,50 +202,58 @@ class _PowerDownState extends State<PowerDown> {
                         physics: BouncingScrollPhysics(),
                         children: [
                           ScreenHeader(
-                              title: 'Power down', hasBackButton: true),
+                              title: widget.changingDelegation
+                                  ? 'Update delegation'
+                                  : 'New delegation',
+                              hasBackButton: true),
+                          Container(
+                            height: 25,
+                          ),
                           Container(
                             padding: myEdgeInsets.leftRight,
-                            child: Row(children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _amountController,
-                                  autovalidateMode:
-                                      AutovalidateMode.onUserInteraction,
-                                  validator: validateNotEmpty,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.allow(
-                                        RegExp(r"[0-9.]")),
-                                    TextInputFormatter.withFunction(
-                                        (oldValue, newValue) {
-                                      try {
-                                        final text = newValue.text;
-                                        if (text.isNotEmpty) double.parse(text);
-                                        return newValue;
-                                      } catch (e) {
-                                        //TODO
-                                      }
-                                      return oldValue;
-                                    }),
-                                  ],
-                                  keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
-                                      hintText: '10.00',
-                                      helperText: 'HIVE to power down'),
-                                  //textAlign: TextAlign.center,
-                                ),
+                            child: TextFormField(
+                              controller: _usernameController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateUsername,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: InputDecoration(
+                                hintText: '@username',
                               ),
-                              NeumorphismContainer(
-                                margin: EdgeInsets.fromLTRB(25, 0, 0, 20),
-                                color: Theme.of(context).backgroundColor,
-                                onTap: () {
-                                  _amountController.text = widget.maxHive;
-                                },
-                                mainContent: Text('max'),
-                                expandableContent: Container(),
-                                expandable: false,
-                                tapable: true,
-                              )
-                            ]),
+                              //textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Container(
+                            height: 25,
+                          ),
+                          Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: TextFormField(
+                              controller: _amountController,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
+                              validator: validateNotEmpty,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r"[0-9.]")),
+                                TextInputFormatter.withFunction(
+                                    (oldValue, newValue) {
+                                  try {
+                                    final text = newValue.text;
+                                    if (text.isNotEmpty) double.parse(text);
+                                    return newValue;
+                                  } catch (e) {
+                                    //TODO
+                                  }
+                                  return oldValue;
+                                }),
+                              ],
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                  hintText: '10.00',
+                                  helperText: 'Amount of HIVE to delegate'),
+                              //textAlign: TextAlign.center,
+                            ),
                           ),
                           Container(
                             height: 25,
@@ -239,26 +262,87 @@ class _PowerDownState extends State<PowerDown> {
                       ),
                     ),
                     Row(children: [
+                      Container(
+                        width: 25,
+                      ),
+                      widget.changingDelegation
+                          ? Expanded(
+                              child: NeumorphismContainer(
+                                margin: EdgeInsets.all(0),
+                                color: Theme.of(context).backgroundColor,
+                                tapable: true,
+                                onTap: () {
+                                  if (_validInputs()) {
+                                    Map<String, dynamic> op = {
+                                      "delegator": '__signer',
+                                      "delegatee": _usernameController.text
+                                          .replaceAll('@', ''),
+                                      "vesting_shares":
+                                          0.00.toString() + ' VESTS',
+                                      "redirect_uri": 'https://hiverrr.com'
+                                    };
+
+                                    //TODO: make sure to get delegation transfer
+                                    Uri uri = hc.getHivesignerSignUrl(
+                                        type: 'delegate_vesting_shares',
+                                        params: op);
+
+                                    if (FocusScope.of(context).isFirstFocus) {
+                                      FocusScope.of(context)
+                                          .requestFocus(new FocusNode());
+                                    }
+                                    confirmTransaction(
+                                        url: uri.toString(), isCancel: true);
+                                  }
+                                },
+                                mainContent: Center(
+                                  child: Text(
+                                    'Cancel',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodyText2!
+                                          .color,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                expandableContent: Container(),
+                                expandable: false,
+                              ),
+                            )
+                          : Container(),
+                      widget.changingDelegation
+                          ? Container(
+                              width: 25,
+                            )
+                          : Container(),
                       Expanded(
                         child: NeumorphismContainer(
+                          margin: EdgeInsets.all(0),
                           color: Theme.of(context).accentColor,
                           tapable: true,
                           onTap: () {
+                            //TODO: amount to vests
                             if (_validInputs()) {
                               Map<String, dynamic> op = {
-                                "account": '__signer',
+                                "delegator": '__signer',
+                                "delegatee": _usernameController.text
+                                    .replaceAll('@', ''),
                                 "vesting_shares":
                                     _amountController.text + ' HP',
                                 "redirect_uri": 'https://hiverrr.com'
                               };
+
                               Uri uri = hc.getHivesignerSignUrl(
-                                  type: 'withdraw_vesting', params: op);
+                                  type: 'delegate_vesting_shares', params: op);
 
                               if (FocusScope.of(context).isFirstFocus) {
                                 FocusScope.of(context)
                                     .requestFocus(new FocusNode());
                               }
-                              confirmTransaction(uri.toString());
+                              confirmTransaction(url: uri.toString());
                             }
                           },
                           mainContent: Center(
@@ -275,15 +359,25 @@ class _PowerDownState extends State<PowerDown> {
                           expandable: false,
                         ),
                       ),
+                      Container(
+                        width: 25,
+                      ),
                     ]),
-                    Container(
-                      height: 10,
-                    ),
-                    Container(
-                      padding: myEdgeInsets.leftRight,
-                      child: Text(
-                          'Please note it will take 13 weeks to power down, you will receive 1/13th of the power down amount every week.'),
-                    ),
+                    widget.changingDelegation
+                        ? Container(
+                            height: 10,
+                          )
+                        : Container(),
+                    widget.changingDelegation
+                        ? Container(
+                            padding: myEdgeInsets.leftRight,
+                            child: Text(
+                              'Canceling a delegation takes 5 days to process',
+                              style: TextStyle(fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : Container(),
                     Container(
                       height: 25,
                     ),

@@ -7,6 +7,7 @@ import 'package:hiverrr/blocs/authbloc/auth_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
+import 'package:hiverrr/presentation/delegations/delegations.dart';
 import 'package:hiverrr/presentation/staking/power_down.dart';
 import 'package:hiverrr/presentation/staking/power_up.dart';
 import 'package:hiverrr/presentation/widgets/neumorphism/neumorphism_container.dart';
@@ -119,7 +120,7 @@ class StakingInfo extends StatelessWidget {
                           TextSpan(
                             text: ' (' +
                                 timeago.format(userBalance.nextPowerDown,
-                                    allowFromNow: true) +
+                                    allowFromNow: true, clock: DateTime.now()) +
                                 ')',
                             style: Theme.of(context).textTheme.bodyText2,
                           ),
@@ -319,24 +320,30 @@ class StakingInfo extends StatelessWidget {
                         ),
                       ),
                     ),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  //TODO
-                  BotToast.showText(
-                    crossPage: false,
-                    text: "This feature is coming soon! 🤩",
-                    textStyle: TextStyle(color: Colors.white),
-                    borderRadius: BorderRadius.circular(4),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      if (state is LoggedIn) {
+                        Navigator.of(context, rootNavigator: true)
+                            .push(MaterialPageRoute(
+                                builder: (_) => DelegationsPage(
+                                      username: state.user.username,
+                                      vestsToHive:
+                                          userBalance.hpToVestsMultiplier,
+                                    )));
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Manage delegations',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   );
                 },
-                child: Container(
-                  padding: EdgeInsets.only(top: 15),
-                  child: Text(
-                    'Manage delegations',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
               ),
             ],
           )),
