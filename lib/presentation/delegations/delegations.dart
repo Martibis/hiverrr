@@ -114,13 +114,16 @@ class _DelegationsPageState extends State<DelegationsPage> {
                               margin: EdgeInsets.fromLTRB(25, 0, 25, 25),
                               color: Theme.of(context).backgroundColor,
                               onTap: () {
-                                Navigator.of(context, rootNavigator: true)
-                                    .push(MaterialPageRoute(
-                                        builder: (_) => Delegation(
-                                              delegation: item,
-                                              changingDelegation: true,
-                                              vestsToHive: widget.vestsToHive,
-                                            )));
+                                item.isExpiring
+                                    ? print('Expiring')
+                                    : Navigator.of(context, rootNavigator: true)
+                                        .push(MaterialPageRoute(
+                                            builder: (_) => Delegation(
+                                                  delegation: item,
+                                                  changingDelegation: true,
+                                                  vestsToHive:
+                                                      widget.vestsToHive,
+                                                )));
                               },
                               expandable: false,
                               tapable: !item.isExpiring,
