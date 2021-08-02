@@ -248,6 +248,12 @@ class _AskLoginState extends State<AskLogin> {
               });
             }
           }),
+      Container(
+        height: 10,
+      ),
+      Container(
+          padding: myEdgeInsets.leftRight,
+          child: Text('For transacting sign in with your active key')),
       Expanded(
         child: Container(
           height: 25,
