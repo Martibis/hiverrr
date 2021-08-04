@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:hiverrr/constants/constants.dart';
 import 'package:hiverrr/data/models/delegation_model.dart';
 import 'package:hiverrr/data/models/subscription_model.dart';
+import 'package:hiverrr/data/models/transaction_model.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -388,7 +389,6 @@ class HiveCalls {
 
     Map data = await jsonDecode(r!.body);
 
-    print(data);
     List<DelegationModel> delegations = [];
     for (int i = 0; i < data['result']['delegations'].length; i++) {
       Map delegationMap = data['result']['delegations'][i];
@@ -446,5 +446,45 @@ class HiveCalls {
       }
     }
     return isReceived;
+  }
+
+  //TODO: figure out how start and limit work
+  getTransactionHistory(
+      {required String username,
+      required int start,
+      required int limit}) async {
+    http.Response? r;
+    for (int i = 0; i < HIVENODES.length; i++) {
+      try {
+        r = await http.post(Uri(scheme: 'https', host: HIVENODES[i]),
+            body: '{"jsonrpc":"2.0", "method":"account_history_api.get_account_history", "params":{"account":"' +
+                username +
+                '", "start":' +
+                start.toString() +
+                ', "limit":' +
+                limit.toString() +
+                ', "operation_filter_low": 848647637693366652, "operation_filter_high": 1713166}, "id":1}');
+        break;
+      } on Exception catch (e) {
+        print('Node failed');
+        print(e);
+      }
+    }
+    Map data = await jsonDecode(r!.body);
+    print(data);
+    List<TransactionModel> transactions = [];
+    for (int i = 0; i < data['result']['history'].length; i++) {
+      List transactionMap = data['result']['history'][i];
+
+      String textKey = transactionMap[1]['op']['type'];
+
+      transactions.add(TransactionModel(
+          textKey: textKey,
+          count: transactionMap[0],
+          username: '',
+          profilepic: '',
+          timestamp: DateTime.parse(transactionMap[1]['timestamp']).toUtc()));
+    }
+    return transactions.reversed.toList();
   }
 }

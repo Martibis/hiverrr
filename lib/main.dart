@@ -6,13 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hiverrr/blocs/delegations_bloc/delegations_bloc.dart';
 import 'package:hiverrr/blocs/subscriptions_bloc/subscriptions_bloc.dart';
+import 'package:hiverrr/blocs/transaction_history_bloc/transaction_history_bloc.dart';
 import 'package:hiverrr/blocs/userbalance_bloc.dart/userbalance_bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
+import 'package:hiverrr/data/hive_calls/hive_calls.dart';
 import 'package:hiverrr/data/models/subscription_model.dart';
 import 'package:hiverrr/presentation/receive/receive.dart';
 import 'package:hiverrr/presentation/send/send.dart';
 import 'package:hiverrr/presentation/subscriptions/subscription.dart';
 import 'package:hiverrr/presentation/subscriptions/subscriptions.dart';
+import 'package:hiverrr/presentation/transactions/transactions.dart';
 import 'package:hiverrr/presentation/widgets/auth/ask_login.dart';
 import 'package:hiverrr/presentation/widgets/info_widgets/estimated_info.dart';
 import 'package:hiverrr/presentation/widgets/info_widgets/savings_info.dart';
@@ -67,6 +70,7 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(create: (context) => UserbalanceBloc()),
         BlocProvider(create: (context) => SubscriptionsBloc()),
+        BlocProvider(create: (context) => TransactionHistoryBloc()),
         BlocProvider(create: (context) => DelegationsBloc())
       ],
       child: MaterialApp(
@@ -401,6 +405,30 @@ class _MyHomePageState extends State<MyHomePage> {
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
+                              )),
+                          expandableContent: Container()),
+                    ),
+                  ]),
+                  Container(
+                    height: 25,
+                  ),
+                  Row(children: [
+                    Expanded(
+                      child: NeumorphismContainer(
+                          padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                          color: Theme.of(context).backgroundColor,
+                          tapable: true,
+                          onTap: () {
+                            Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                    builder: (_) => TransactionsPage(
+                                        username: state.user.username)));
+                          },
+                          mainContent: Text('Transaction history',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
                               )),
                           expandableContent: Container()),
                     ),
@@ -754,26 +782,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Theme.of(context).backgroundColor,
                         tapable: true,
                         onTap: () {
-                          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                              builder: (_) => Subscription(
-                                  subscription: SubscriptionModel(
-                                      username: 'martibis',
-                                      memo:
-                                          'Thanks for buying me a coffee every month (:',
-                                      profilepic:
-                                          'https://images.ecency.com/webp/u/martibis/avatar/medium',
-                                      amount: 5,
-                                      currency: 'HBD',
-                                      reccurenceString: 'Monthly',
-                                      recurrence: HOURSPERMONTH,
-                                      remainingExecutions:
-                                          23)) /* ManualTransfer(
-                                        username: 'martibis',
-                                        amount: '5',
-                                        memo:
-                                            'Thank you for wanting to donate so we can keep improving Hiverrr!',
-                                      ) */
-                              ));
+                          Navigator.of(context, rootNavigator: true).push(
+                              MaterialPageRoute(
+                                  builder: (_) => Subscription(
+                                      subscription: SubscriptionModel(
+                                          username: 'martibis',
+                                          memo:
+                                              'Thanks for buying me a coffee every month (:',
+                                          profilepic:
+                                              'https://images.ecency.com/webp/u/martibis/avatar/medium',
+                                          amount: 5,
+                                          currency: 'HBD',
+                                          reccurenceString: 'Monthly',
+                                          recurrence: HOURSPERMONTH,
+                                          remainingExecutions: 23))));
                         },
                         mainContent: Text(
                           '☕',
