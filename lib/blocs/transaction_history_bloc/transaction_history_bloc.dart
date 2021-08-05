@@ -16,16 +16,24 @@ class TransactionHistoryBloc
   List<TransactionModel> transactions = [];
   bool hasReachedMax = false;
   int? nextPageKey;
+  num vestsToHiveMultiplier = 1;
 
   @override
   Stream<TransactionHistoryState> mapEventToState(
     TransactionHistoryEvent event,
   ) async* {
+    if (event is SetMultiplier) {
+      vestsToHiveMultiplier = await hc.getVestsToHive();
+    }
     if (event is FetchTransactions) {
       yield IsLoading(isLoading: true);
       try {
+        print(event.pageKey);
         List<TransactionModel> newTransactions = await hc.getTransactionHistory(
-            username: event.username, start: event.pageKey, limit: limit);
+            username: event.username,
+            start: event.pageKey,
+            limit: limit,
+            vestsToHiveMultiplier: vestsToHiveMultiplier);
         transactions = [...transactions, ...newTransactions];
 
         if (event.pageKey == -1) {

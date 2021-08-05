@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:hiverrr/constants/constants.dart';
-import 'package:hiverrr/data/hive_calls/hive_calls.dart';
 import 'package:hiverrr/data/models/user_balance_model.dart';
 import 'package:meta/meta.dart';
 

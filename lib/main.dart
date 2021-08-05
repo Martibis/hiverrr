@@ -70,7 +70,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(create: (context) => UserbalanceBloc()),
         BlocProvider(create: (context) => SubscriptionsBloc()),
-        BlocProvider(create: (context) => TransactionHistoryBloc()),
+        BlocProvider(
+            create: (context) =>
+                TransactionHistoryBloc()..add(SetMultiplier())),
         BlocProvider(create: (context) => DelegationsBloc())
       ],
       child: MaterialApp(
@@ -286,8 +288,6 @@ class _MyHomePageState extends State<MyHomePage> {
                             showUserOptions(username: state.user.username);
                           },
                           mainContent: Container(
-                            /*      height: 50,
-                                        width: 50, */
                             child: CircleAvatar(
                               backgroundColor:
                                   Theme.of(context).backgroundColor,

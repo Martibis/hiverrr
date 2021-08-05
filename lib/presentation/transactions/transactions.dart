@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -71,7 +72,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
                             TransactionModel>(
                         noItemsFoundIndicatorBuilder: (context) =>
                             EmptyListIndicator(
-                              message: 'No active transactions',
+                              message: 'No transactions found',
                             ),
                         noMoreItemsIndicatorBuilder: (context) => Container(),
                         firstPageErrorIndicatorBuilder: (context) =>
@@ -103,18 +104,104 @@ class _TransactionsPageState extends State<TransactionsPage> {
                               message: 'Loading transactions',
                             ),
                         itemBuilder: (_, item, index) {
-                          return NeumorphismContainer(
-                              margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
-                              color: Theme.of(context).backgroundColor,
-                              onTap: () {},
-                              expandable: false,
-                              tapable: false,
-                              mainContent: Row(
-                                children: [
-                                  Text(timeago.format(item.timestamp))
-                                ],
-                              ),
-                              expandableContent: Container());
+                          return item.showTransaction
+                              ? NeumorphismContainer(
+                                  margin: EdgeInsets.fromLTRB(25, 25, 25, 0),
+                                  color: Theme.of(context).backgroundColor,
+                                  onTap: () {},
+                                  expandable: false,
+                                  tapable: false,
+                                  mainContent: Row(
+                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      item.isProfilepic
+                                          ? Container(
+                                              padding: EdgeInsets.only(top: 5),
+                                              child: CircleAvatar(
+                                                radius: 25,
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .backgroundColor,
+                                                child: CircleAvatar(
+                                                  radius: 24,
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .backgroundColor,
+                                                  backgroundImage:
+                                                      CachedNetworkImageProvider(
+                                                    item.asset,
+                                                  ),
+                                                ),
+                                              ))
+                                          : Container(
+                                              padding: EdgeInsets.only(top: 5),
+                                              child: CircleAvatar(
+                                                radius: 25,
+                                                backgroundColor:
+                                                    Theme.of(context)
+                                                        .backgroundColor,
+                                                child: CircleAvatar(
+                                                  radius: 24,
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .backgroundColor,
+                                                  child: Center(
+                                                    child: Text(
+                                                      item.emoji,
+                                                      style: TextStyle(
+                                                          fontSize: 25),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                      Container(
+                                        width: 20,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.infoText,
+                                            ),
+                                            Container(
+                                              height: 10,
+                                            ),
+                                            item.amountText != ''
+                                                ? Text(
+                                                    item.amountText,
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 18),
+                                                  )
+                                                : Container(),
+                                            item.amountText != ''
+                                                ? Container(
+                                                    height: 10,
+                                                  )
+                                                : Container(),
+                                            item.hasSecondInfoText
+                                                ? Text(item.secondInfoText!)
+                                                : Container(),
+                                            item.hasSecondInfoText
+                                                ? Container(
+                                                    height: 10,
+                                                  )
+                                                : Container(),
+                                            Text(
+                                              timeago.format(item.timestamp),
+                                              style: TextStyle(fontSize: 13),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  expandableContent: Container())
+                              : Container();
                         })),
               ))),
     ])));

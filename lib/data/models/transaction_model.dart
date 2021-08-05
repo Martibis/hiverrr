@@ -1,15 +1,26 @@
-//TODO: think of what can be needed here
 class TransactionModel {
-  int count;
-  String? username;
-  String? profilepic;
   DateTime timestamp;
+  int count;
   String textKey;
+  String asset;
+  bool isProfilepic;
+  String infoText;
+  String amountText;
+  String? secondInfoText;
+  bool hasSecondInfoText;
+  bool showTransaction;
+  String emoji;
 
   TransactionModel(
-      {this.username,
-      this.profilepic,
-      required this.textKey,
+      {required this.textKey,
       required this.count,
-      required this.timestamp});
+      required this.timestamp,
+      required this.amountText,
+      required this.asset,
+      required this.infoText,
+      required this.isProfilepic,
+      this.secondInfoText,
+      this.hasSecondInfoText = false,
+      this.showTransaction = true,
+      required this.emoji});
 }

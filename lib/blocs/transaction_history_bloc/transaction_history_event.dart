@@ -7,5 +7,10 @@ class FetchTransactions extends TransactionHistoryEvent {
   final int pageKey;
   final String username;
 
-  FetchTransactions({required this.pageKey, required this.username});
+  FetchTransactions({
+    required this.pageKey,
+    required this.username,
+  });
 }
+
+class SetMultiplier extends TransactionHistoryEvent {}
