@@ -192,7 +192,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
                                                   )
                                                 : Container(),
                                             Text(
-                                              timeago.format(item.timestamp),
+                                              timeago.format(item.timestamp,
+                                                  clock: DateTime.now()),
                                               style: TextStyle(fontSize: 13),
                                             )
                                           ],

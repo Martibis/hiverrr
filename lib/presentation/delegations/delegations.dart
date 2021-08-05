@@ -155,9 +155,9 @@ class _DelegationsPageState extends State<DelegationsPage> {
                                                 text: ' ' +
                                                     '(' +
                                                     timeago.format(
-                                                      item.expireDate!,
-                                                      allowFromNow: true,
-                                                    ) +
+                                                        item.expireDate!,
+                                                        allowFromNow: true,
+                                                        clock: DateTime.now()) +
                                                     ')',
                                                 style: Theme.of(context)
                                                     .textTheme

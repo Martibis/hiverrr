@@ -505,6 +505,10 @@ class HiveCalls {
       String textKey = transactionMap[1]['op']['type'];
       textKey = textKey.replaceAll('_operation', '');
 
+      DateTime utcTime = DateTime.parse(transactionMap[1]['timestamp'])
+          .add(DateTime.parse(transactionMap[1]['timestamp']).timeZoneOffset)
+          .toUtc();
+
       TransactionModel transaction = TransactionModel(
           emoji: '👍',
           amountText: '',
@@ -514,7 +518,7 @@ class HiveCalls {
           asset: '',
           textKey: textKey,
           count: transactionMap[0],
-          timestamp: DateTime.parse(transactionMap[1]['timestamp']).toUtc());
+          timestamp: utcTime);
       switch (textKey) {
         case 'curation_reward':
           {}
