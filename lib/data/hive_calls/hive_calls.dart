@@ -341,8 +341,6 @@ class HiveCalls {
 
     Map data = await jsonDecode(r!.body);
 
-    //TODO: loop over and create delegation models
-    print(data);
     List<DelegationModel> delegations = [];
     for (int i = 0; i < data['result']['delegations'].length; i++) {
       Map delegationMap = data['result']['delegations'][i];
@@ -392,7 +390,6 @@ class HiveCalls {
     for (int i = 0; i < data['result']['delegations'].length; i++) {
       Map delegationMap = data['result']['delegations'][i];
 
-      print(vestsToHive);
       num hivePowerAmount =
           (num.tryParse(delegationMap['vesting_shares']['amount'])! /
                   (pow(10, delegationMap['vesting_shares']['precision']))) /
@@ -800,7 +797,6 @@ class HiveCalls {
           break;
         case 'proposal_pay':
           {
-            print(transactionMap);
             transaction.infoText = 'Proposal payment';
             num? amount = num.tryParse(
                 transactionMap[1]['op']['value']['payment']['amount']);
@@ -925,12 +921,17 @@ class HiveCalls {
               transaction.amountText =
                   finalAmount.toStringAsFixed(3) + ' ' + currency;
             } else {
-              transaction.infoText = 'Subscription ' +
+              transaction.infoText = 'Subscription' +
                   (isSender
                       ? (' to ' + transactionMap[1]['op']['value']['to'])
                       : (' from ' + transactionMap[1]['op']['value']['from'])) +
                   ' stopped';
             }
+            String? memo = transactionMap[1]['op']['value']['memo'];
+            memo != null
+                ? transaction.hasSecondInfoText = true
+                : transaction.hasSecondInfoText = false;
+            transaction.secondInfoText = memo;
             String profilepic = 'https://images.ecency.com/webp/u/' +
                 (isSender
                     ? transactionMap[1]['op']['value']['to']
@@ -961,6 +962,11 @@ class HiveCalls {
             num finalAmount = (amount! / (pow(10, precision)));
             transaction.amountText =
                 finalAmount.toStringAsFixed(3) + ' ' + currency;
+            String? memo = transactionMap[1]['op']['value']['memo'];
+            memo != null
+                ? transaction.hasSecondInfoText = true
+                : transaction.hasSecondInfoText = false;
+            transaction.secondInfoText = memo;
 
             String profilepic = 'https://images.ecency.com/webp/u/' +
                 (isSender
