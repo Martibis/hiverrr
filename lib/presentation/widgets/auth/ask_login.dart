@@ -23,7 +23,6 @@ class AskLogin extends StatefulWidget {
 }
 
 class _AskLoginState extends State<AskLogin> {
-  late AuthBloc authBloc;
   Future<bool> _termsOfServiceAccepted() async {
     String? acceptedTos = await STORAGE.read(key: 'tos');
     if (acceptedTos == 'yes') {
@@ -35,7 +34,6 @@ class _AskLoginState extends State<AskLogin> {
 
   @override
   void initState() {
-    authBloc = BlocProvider.of<AuthBloc>(context);
     super.initState();
   }
 
@@ -155,10 +153,11 @@ class _AskLoginState extends State<AskLogin> {
                                               .containsKey('username')) {
                                         String? username =
                                             uri.queryParameters['username'];
-                                        authBloc.add(HiveLogin(
-                                            username: username != null
-                                                ? username
-                                                : ''));
+                                        BlocProvider.of<AuthBloc>(context).add(
+                                            HiveLogin(
+                                                username: username != null
+                                                    ? username
+                                                    : ''));
                                         cancel();
                                       }
                                     },
@@ -229,10 +228,11 @@ class _AskLoginState extends State<AskLogin> {
                                                 .containsKey('username')) {
                                           String? username =
                                               uri.queryParameters['username'];
-                                          authBloc.add(HiveLogin(
-                                              username: username != null
-                                                  ? username
-                                                  : ''));
+                                          BlocProvider.of<AuthBloc>(context)
+                                              .add(HiveLogin(
+                                                  username: username != null
+                                                      ? username
+                                                      : ''));
                                           cancel();
                                         }
                                       },
@@ -285,10 +285,10 @@ class _AskLoginState extends State<AskLogin> {
             color: Theme.of(context).backgroundColor,
             tapable: true,
             onTap: () {
-              //TODO: send with receiver martibis
+              launch('https://github.com/Martibis/hiverrr');
             },
             mainContent: Text(
-              '🎁',
+              '🤓',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               ),
@@ -304,7 +304,6 @@ class _AskLoginState extends State<AskLogin> {
               color: Theme.of(context).backgroundColor,
               tapable: true,
               onTap: () {
-                //TODO: go to profile?
                 launch('https://peakd.com/@martibis');
               },
               mainContent: Text(
